@@ -1,0 +1,22 @@
+# ninja log v5
+2	1689	1704223365104200959	CMakeFiles/LveEngine.dir/src/first_app.cpp.o	639c2437dbcdf221
+0	158	1703809098939480622	/home/neo/Documents/dev/littleVulkanEngine/shaders/point_light.frag.spv	779bb99d6e843886
+725	1849	1703809066622679411	CMakeFiles/LveEngine.dir/src/lve_descriptors.cpp.o	fa85109e5a195319
+1989	5355	1703809070126027552	CMakeFiles/LveEngine.dir/src/lve_model.cpp.o	78e0905dcff4cfba
+2	1515	1703809066292678013	CMakeFiles/LveEngine.dir/src/keyboard_movement_controller.cpp.o	306eaca54fd5d8ae
+2271	2999	1703809067776017626	CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o	9a8f73f7a1977c73
+0	157	1703809098926147234	/home/neo/Documents/dev/littleVulkanEngine/shaders/point_light.vert.spv	8a920ad84fe29962
+2982	3400	1703809068176019317	CMakeFiles/LveEngine.dir/src/lve_window.cpp.o	dd06ebc11304bf8e
+2999	4155	1703809068932689182	CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o	3227a13adf09d92b
+695	2271	1703809067046014538	CMakeFiles/LveEngine.dir/src/lve_device.cpp.o	8c72e7a4ebb6e4a5
+1849	2982	1703809067759350889	CMakeFiles/LveEngine.dir/src/lve_game_object.cpp.o	4174b89e72298610
+0	158	1703809098942813970	/home/neo/Documents/dev/littleVulkanEngine/shaders/simple_shader.frag.spv	b9a31d83608bcdf2
+5356	5636	1703809070409362081	LveEngine	d5e998f46b01be92
+2210	3481	1703809068256019656	CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o	bb5d65c9b0c41de8
+4155	5334	1703809070109360815	CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o	e928d28f25bfb056
+0	158	1703809098939480622	/home/neo/Documents/dev/littleVulkanEngine/shaders/simple_shader.vert.spv	692fca8be92e5742
+6	695	1703809065469341191	CMakeFiles/LveEngine.dir/src/lve_camera.cpp.o	4879ea92d906d382
+3400	4690	1703809069459358073	CMakeFiles/LveEngine.dir/src/main.cpp.o	3dc86e786317902e
+2	725	1703809065502674666	CMakeFiles/LveEngine.dir/src/lve_buffer.cpp.o	40c95b0d49a7777
+1515	2210	1703809066986014284	CMakeFiles/LveEngine.dir/src/lve_image.cpp.o	c9e9cb891c48deeb
+3481	4921	1703809069696025738	CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o	3f1222887f32984a

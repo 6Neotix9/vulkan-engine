@@ -27,9 +27,9 @@ else()
   message(STATUS "Found Vulkan: $ENV{VULKAN_SDK}")
 endif()
 if (NOT Vulkan_FOUND)
-    message(FATAL_ERROR "Could not find Vulkan library!")
+	message(FATAL_ERROR "Could not find Vulkan library!")
 else()
-    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
+	message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
 endif()
 
 
@@ -49,10 +49,12 @@ else()
   message(STATUS "Found GLFW")
 endif()
 if (NOT GLFW_LIB)
-    message(FATAL_ERROR "Could not find glfw library!")
+	message(FATAL_ERROR "Could not find glfw library!")
 else()
-    message(STATUS "Using glfw lib at: ${GLFW_LIB}")
+	message(STATUS "Using glfw lib at: ${GLFW_LIB}")
 endif()
+
+
 
 include_directories(external)
 
@@ -62,14 +64,12 @@ if (NOT TINYOBJ_PATH)
   set(TINYOBJ_PATH external/tinyobjloader)
 endif()
 
-
 # If STB_image not specified in .env.cmake, try fetching from git repo
 if (NOT IMG_PATH)
   message(STATUS "TINYOBJ_PATH not specified in .env.cmake, using external/stb_image")
   set(IMG_PATH external/stb_image)
 endif()
 
-find_package( OpenCV REQUIRED )
 
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
@@ -105,7 +105,7 @@ if (WIN32)
     ${GLFW_LIB}
   )
 
-  target_link_libraries(${PROJECT_NAME} glfw3 vulkan-1)
+  target_link_libraries(${PROJECT_NAME} glfw3 uv vulkan-1 )
 elseif (UNIX)
     message(STATUS "CREATING BUILD FOR UNIX")
     target_include_directories(${PROJECT_NAME} PUBLIC
@@ -113,7 +113,7 @@ elseif (UNIX)
       ${TINYOBJ_PATH}
       ${IMG_PATH}
     )
-    target_link_libraries(${PROJECT_NAME} glfw ${Vulkan_LIBRARIES} ${OpenCV_LIBS})
+    target_link_libraries(${PROJECT_NAME} glfw uv ${Vulkan_LIBRARIES} )
 endif()
 
 
@@ -136,7 +136,6 @@ find_program(GLSL_VALIDATOR glslangValidator HINTS
 file(GLOB_RECURSE GLSL_SOURCE_FILES
   "${PROJECT_SOURCE_DIR}/shaders/*.frag"
   "${PROJECT_SOURCE_DIR}/shaders/*.vert"
-  "${PROJECT_SOURCE_DIR}/shaders/*.comp"
 )
 
 foreach(GLSL ${GLSL_SOURCE_FILES})

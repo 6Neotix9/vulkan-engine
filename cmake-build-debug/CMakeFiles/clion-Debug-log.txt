@@ -1,0 +1,13 @@
+/home/neo/.local/share/JetBrains/Toolbox/apps/CLion-Nova/ch-0/233.13309/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/neo/.local/share/JetBrains/Toolbox/apps/CLion-Nova/ch-0/233.13309/bin/ninja/linux/x64/ninja -G Ninja -S /home/neo/Documents/dev/littleVulkanEngine -B /home/neo/Documents/dev/littleVulkanEngine/cmake-build-debug
+-- Local .env.cmake: NOTFOUND
+-- using Ninja
+-- Found Vulkan: 
+-- Using vulkan lib at: /lib/libvulkan.so
+-- Found GLFW
+-- Using glfw lib at: glfw
+-- TINYOBJ_PATH not specified in .env.cmake, using external/tinyobjloader
+-- TINYOBJ_PATH not specified in .env.cmake, using external/stb_image
+-- CREATING BUILD FOR UNIX
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/neo/Documents/dev/littleVulkanEngine/cmake-build-debug

@@ -3,6 +3,7 @@
 #include "lve_window.hpp"
 
 // std lib headers
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -15,8 +16,7 @@ struct SwapChainSupportDetails {
 };
 
 struct QueueFamilyIndices {
-    // uint32_t graphicsFamily;
-    uint32_t graphicsAndComputeFamily;
+    uint32_t graphicsFamily;
     uint32_t presentFamily;
     bool graphicsFamilyHasValue = false;
     bool presentFamilyHasValue = false;
@@ -49,26 +49,37 @@ class LveDevice {
     SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(physicalDevice); }
-    VkFormat findSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling,
-                                 VkFormatFeatureFlags features);
-
-    VkPhysicalDevice getPhysicalDevice() { return physicalDevice; }
+    VkFormat findSupportedFormat(
+        const std::vector<VkFormat> &candidates,
+        VkImageTiling tiling,
+        VkFormatFeatureFlags features);
 
     // Buffer Helper Functions
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer,
-                      VkDeviceMemory &bufferMemory);
+    void createBuffer(
+        VkDeviceSize size,
+        VkBufferUsageFlags usage,
+        VkMemoryPropertyFlags properties,
+        VkBuffer &buffer,
+        VkDeviceMemory &bufferMemory);
     VkCommandBuffer beginSingleTimeCommands();
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
+    void copyBufferToImage(
+        VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
 
-    void createImageWithInfo(const VkImageCreateInfo &imageInfo, VkMemoryPropertyFlags properties, VkImage &image,
-                             VkDeviceMemory &imageMemory);
+    void createImageWithInfo(
+        const VkImageCreateInfo &imageInfo,
+        VkMemoryPropertyFlags properties,
+        VkImage &image,
+        VkDeviceMemory &imageMemory);
 
+    void stopRendering();
+
+    void startRendering();
+
+    std::mutex stopRenderingMutex = std::mutex();
+    
     VkPhysicalDeviceProperties properties;
-
-    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount,
-                           VkImageLayout imageLayout);
 
    private:
     void createInstance();

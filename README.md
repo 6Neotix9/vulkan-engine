@@ -1,127 +1,164 @@
-# Tu-Tournes engine
+# Little Vulkan Engine
 
-par GRANGER Aloïs VERNAY Jérémie
+**(Prior version of repo has now been moved to the [tut0-22 branch](https://github.com/blurrypiano/littleVulkanEngine/tree/tut0-22))**
 
-Ce projet consiste en la modélisation et l'animation d'un océan et des nuage sur un moteur de rendu C++ / Vulkan.
+A video tutorial series introducing computer graphics for [Vulkan®](https://www.khronos.org/vulkan/), the new generation graphics and compute API from Khronos. The focus of this tutorial is to be approachable to newcomers to computer graphics and graphics APIs, explaining not just the Vulkan API but also computer graphics theory, mathematics and engine architecture.
 
-## Image du rendu final
+## Table of Contents
 
-![alt text](http://www.image-heberg.fr/files/1701529577642878628.png )
+- [Building](#Building)
+  - [Building for Unix](#UnixBuild)
+  - [Building for MacOS](#MacOSBuild)
+  - [Building for Windows](#WindowsBuild)
+- [Tutorials](#Tutorials)
+  - [Basics](#Basics)
+  - [Point Lights](#PointLights)
+- [Official Khronos Vulkan Samples](#Khronossamples)
+- [Credits and Attributions](#CreditsAttributions)
 
+## <a name="Building"></a> Building
 
-# Mise en place du projet
+### <a name="UnixBuild"></a> Unix Build Instructions
 
-Le projet à été consue et tester uniquement sur Linux. Il peut normalement fonctionner sur windows mais il n'as pas été testé.
+- Install the dependencies: cmake, glm, vulkan and glfw
 
-## Dépendances vulkan
+- For example
+  ```
+    sudo apt install vulkan-tools
+    sudo apt install libvulkan-dev
+    sudo apt install vulkan-validationlayers-dev spirv-tools
+    sudo apt install libglfw3-dev
+    sudo apt install libglm-dev
+    sudo apt install cmake
+  ```
+- To Build
+  ```
+   cd LittleVulkanEngine
+   ./unixBuild.sh
+  ```
 
-[Lien tuto installation vulkan](https://vulkan-tutorial.com/Development_environment)
+### <a name="MacOSBuild"></a> MacOS Build Instructions
 
-Le site du tutoriel de vulkan indique quel paquet installer selon l'os et la distribution.
-Il indique les paquets pour vulkan ainsi que les paquets pour la compilation des shaders, la gestion de la fenêtre...
+#### Install Dependencies
 
-## Dépendances pour la compilation
+- [Download and install MacOS Vulkan sdk](https://vulkan.lunarg.com/)
+- [Download and install Homebrew](https://brew.sh/)
 
-- gcc
-- g++
-- cmake
-- make
+- Then in a terminal window
 
-## Consigne pour compiler
+  ```
+    brew install cmake
+    brew install glfw
+    brew install glm
+  ```
 
-### Sur UNIX
+- To Build
+  ```
+   cd littleVulkanEngine
+   ./unixBuild.sh
+  ```
 
-Vous avez juste à éxecuter la commande : `./unixBuild.sh`
+### <a name="WindowsBuild"></a> Windows build instructions
 
-Le programme s'execute automatiquement
+- [Download and install Windows Vulkan sdk](https://vulkan.lunarg.com/)
+- [Download and install Windows cmake x64 installer](https://cmake.org/download/)
+  - Make sure to select "Add cmake to the system Path for all users"
+- [Download GLFW](https://www.glfw.org/download.html) (64-bit precompiled binary)
+- [Download GLM](https://github.com/g-truc/glm/releases)
+- Download and open the project and rename "envWindowsExample.cmake" to ".env.cmake"
+- Update the filepath variables in .env.cmake to your installation locations
 
-### Pour les autres OS
+#### Building for Visual Studio 2019
 
-Pour compiler :
+- In windows powershell
+
 ```
-mkdir build && cd build
-cmake ..
-cmake --build ./ --target Shaders
-cmake --build ./ --target all
+ cd littleVulkanEngine
+ mkdir build
+ cmake -S . -B .\build\
 ```
-Pour lancer :
+
+- If cmake finished successfully, it will create a LveEngine.sln file in the build directory that can be opened with visual studio. In visual studio right click the Shaders project -> build, to build the shaders. Right click the LveEngine project -> set as startup project. Change from debug to release, and then build and start without debugging.
+
+#### Building for minGW
+
+- [Download and install MinGW-w64](https://www.mingw-w64.org/downloads/), you probably want MingW-W64-builds/
+- Make sure MinGW has been added to your Path
+- Also set MINGW_PATH variable in the project's .env.cmake
+- In windows powershell
+
 ```
-./LveEngine
+ cd littleVulkanEngine
+ ./mingwBuild.bat
 ```
-# Explication projet
 
-## Sources
+- This will build the project to build/LveEngine.exe, double click in file explorer to open and run
 
-Pour le moteur nous nous somme basé sur le tutoriel de [Brendan Galea](https://www.youtube.com/@BrendanGalea) qui suit le tutoriel du site [vulkan-tutorial](https://vulkan-tutorial.com/).
-Cela nous à permis d'avoir une base qui permetait de charger et d'afficher des fichier 3D (obj) avec un modèle de lumière Blinn–Phong.
+## <a name="Tutorials"></a> Tutorials
 
-Pour l'implémentation de l'eau nous nous somme basé sur l'implémenation [Jump Trajectory](https://www.youtube.com/watch?v=kGEqaX4Y4bQ).
+### [Vulkan Basics - Tutorials 0 to 22](https://github.com/blurrypiano/littleVulkanEngine/tree/tut0-22)
 
+This branch is a legacy branch that holds all the older tutorials in the series, starting from the beginning and going up until tutorial 22.
 
-## Structure du projet
+### <a name="PointLights"></a> Point Lights
 
-Tout les fichier du moteur se trouve dans src. Les shaders et les différentes ressource se trouve dans leur dossiers respectif.
+Find the [Preliminary Completed Project Here](https://github.com/blurrypiano/littleVulkanEngine/tree/pointLights)
 
-### Explication du moteur de rendu
+#### [21 - Intro to Point Lights](https://github.com/blurrypiano/littleVulkanEngine/tree/master/littleVulkanEngine/tutorial21)
 
-#### - firs_app -
-C'est ce fichier qui s'occupe de l'initialisation et de la boucle du moteur. Il charge les différents shader, les objets de la scène, les objets vulkan.
+In this tutorial we add a point light object to the global UBO and update the vertex shader to make use of this new lighting technique. ([Video](https://youtu.be/Z1lLwAEMt4M))
 
-#### - keyboard_movement_component -
-Ce fichier s'occupe de la gestion des entrées clavier. Il permet de déplacer la caméra dans la scène.
+#### [22 - Vertex vs Fragment Lighting](https://github.com/blurrypiano/littleVulkanEngine/tree/master/littleVulkanEngine/tutorial22)
 
-#### - lve_buffer -
-Ce fichier s'occupe de la gestion des buffers. Il permet de créer des buffers, de les remplir et de les détruire. Les buffers sont utilisé pour stoquer les donnée de transfert entre le gpu et le cpu, comme les vertex, les uniform buffer...
+In this tutorial we explore the differences in per-fragment versus per-vertex lighting ([Video](https://youtu.be/YnMyKHfrgU4))
 
-#### - lve_c_pipeline -
-Ce fichier s'occupe de la gestion des pipelines de calcul. Il permet de créer des pipelines de calcul, de les détruire et de les utiliser.
+#### [23 - Project Restructure and cmake](https://github.com/blurrypiano/littleVulkanEngine/tree/tut23)
 
-#### - lve_camera -
-Ce fichier s'occupe de la gestion de la caméra. Créer les matrices de projection et de vue. Il permet aussi de déplacer la caméra.
+In this tutorial I change the project to use cmake rather than a simple makefile to make building on multiple platforms simpler and more straightforward. ([Video](https://youtu.be/ZuHK_5cJ6B8))
 
-#### - lve_descriptor_set -
-Ce fichier s'occupe de la gestion des descriptor set et layout. Les descriptors servent à passer beaucoup de donnée au shaders (images, liste d'objet....).
+#### [24 - Billboards](https://github.com/blurrypiano/littleVulkanEngine/tree/tut24)
 
-#### - lve_device -
-Ce fichier s'occupe de la gestion du GPU. Cela permet d'obtenir tout les informations sur le GPU (queue, extension supporté, taille de descriptor set max, taille de push constant max...). C'est lui qui permet de faire le lien entre le CPU et le GPU avec à travers les fonction de vulkan.
+In this tutorial we implement a second rendering system that uses the billboard technique to render a spherical point light.
+([Video](https://youtu.be/91-89b3wlSo))
 
-#### - lve_g_pipeline -
-Ce fichier s'occupe de la gestion des pipelines graphique. Les pipeline graphic indique quel étape du rendu seront effectuer (vertex, fragment, tesselation). Cela permet de modifier les paramètre de rendu général (transparence, multi sampling).
+#### [25 - Multiple Point Lights](https://github.com/blurrypiano/littleVulkanEngine/tree/tut25)
 
-#### - lve_game_object -
-Ce fichier s'occupe de la gestion des objets de la scène.
+In this tutorial we add support for multiple point light objects in the scene. Lights will still be stored in the GlobalUbo, however for rendering the light objects we will use push constants.
 
-#### - lve_model -
-Ce fichier s'occupe de la gestion des modèles 3D. Il permet de charger un fichier obj et de le stocker dans un buffer.
+([Video](https://youtu.be/1olS6ayckKM))
 
-#### - lve_post_processing_manager -
-Ce fichier s'occupe de la gestion du post processing. Il permet d'exécuter plusieurs système de post processing en leur fournissant une image d'entré et de sortie.
+#### [26 - Specular Lighting](https://github.com/blurrypiano/littleVulkanEngine/tree/tut26)
 
-#### - lve_pre_processing_manager -
-Ce fichier s'occupe de la gestion du pre processing. Il permet d'exécuter plusieurs système de pre processing qui servent à préparer les donnée pour le rendu (bouger la position de particule, culling...).
+In this tutorial we add specular lighting to our simple fragment shader.
 
-#### - lve_renderer -
-Ce fichier s'occupe de la gestion du rendu. Il permet de créer les différents objets de rendu (command buffer, swapchain, render pass, frame buffer...). Il s'occupe de lancer les différents étape du rendu.
+([Video](https://youtu.be/8CTr0SKQ21U))
 
-#### - lve_swap_chain -
-Ce fichier s'occupe de la gestion de la swapchain. La swapchain est un ensemble d'image qui seront afficher à l'écran.
+#### [27 - Alpha Blending and Transparency](https://github.com/blurrypiano/littleVulkanEngine/tree/tut27)
 
-#### - lve_texture -
-Ce fichier s'occupe de la gestion des textures. Il permet de charger une texture et de la stocker dans un buffer à partir de plusieurs source (fichier, donnée généré par le processeur) pour différente utilisation (texture pour du calcul, pour être sampler sur un modèle...).
+In this tutorial we add a limited blending capability to our point light system, allowing them to be rendered with a nicer appearance. 
 
-#### - lve_window -
-Ce fichier s'occupe de la gestion de la fenêtre. Il permet de récupérer les entrées clavier et souris.
+([Video](https://youtu.be/uZqxj6tLDY4))
 
+## <a name="Khronossamples"></a> Official Khronos Vulkan Samples
 
-### Explication des systèmes
+Khronos made an official Vulkan Samples repository available to the public ([press release](https://www.khronos.org/blog/vulkan-releases-unified-samples-repository?utm_source=Khronos%20Blog&utm_medium=Twitter&utm_campaign=Vulkan%20Repository)).
 
-Les différent système sont dans le dossier src/systems. Et sont divisé en 2 catégories : ceux de rendu et ceux de calcul.
+You can find this repository at https://github.com/KhronosGroup/Vulkan-Samples
 
-#### - WaveGenerationSystem -
+## <a name="CreditsAttributions"></a> Credits
 
-Ce système s'occupe de générer les vagues. Ce system implémente l'algorithme de [Jump Trajectory](https://www.youtube.com/watch?v=kGEqaX4Y4bQ) pour la génération des texture de displacement, de normal et de turbulence en se basant sur les fonction JONSWAP et de FFT.
+Thanks to the authors of these libraries :
 
+- [OpenGL Mathematics (GLM)](https://github.com/g-truc/glm)
 
-#### - water_system -
+Thanks to [LunarG](http://www.lunarg.com)
 
-Ce système s'occupe du rendu de l'eau. Il utilise les textures génére par le système WaveGenerationSystem pour calculer la position des vertex de l'eau et les afficher à l'écran. Il utilise aussi une texture de normal pour simuler les reflet de la lumière sur l'eau.
+Thanks to the wonderful opensource examples by [Sascha Willems](https://github.com/SaschaWillems/Vulkan)
+
+Thanks to [ThinMatrix](https://www.youtube.com/user/ThinMatrix/featured) and his wonderful OpenGL game tutorial series which was a huge inspiration for this series and how I first started learning computer graphics
+
+Thanks to [Sean Plott](https://day9.tv/) and the #DK30 challenge, for providing the motivating kick to give this a shot
+
+## Attributions / Licenses
+
+- Vulkan and the Vulkan logo are trademarks of the [Khronos Group Inc.](http://www.khronos.org)

@@ -1,35 +1,38 @@
 #pragma once
 
-#include "lve_camera.hpp"
+#include <vulkan/vulkan_core.h>
 #include "lve_device.hpp"
-#include "lve_g_pipeline.hpp"
-#include "lve_game_object.hpp"
 #include "lve_frame_info.hpp"
+#include "lve_pipeline.hpp"
+#include "systems/lve_I_system.hpp"
 
-
+// std
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan_core.h>
+#include <mutex>
+
 namespace lve {
-class SimpleRenderSystem {
-public:
+class SimpleRenderSystem : public LveISystem {
+   public:
+    SimpleRenderSystem(
+        LveDevice &device, std::shared_ptr<VkRenderPass> renderPass, VkDescriptorSetLayout globalSetLayout);
+    ~SimpleRenderSystem();
 
+    SimpleRenderSystem(const SimpleRenderSystem &) = delete;
+    SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
-  SimpleRenderSystem(LveDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout);
-  ~SimpleRenderSystem();
+    void renderGameObjects(FrameInfo &frameInfo);
 
-  SimpleRenderSystem(const LveWindow &) = delete;
-  SimpleRenderSystem &operator=(const LveWindow &) = delete;
+    void reloadShaders() override;
 
-  void renderGameObjects(FrameInfo &frameInfo);
+   private:
+    void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+    void createPipeline(VkRenderPass renderPass);
 
-private:
-  void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout);
-  void createPipeLine(VkRenderPass renderPass);
-
-
-  LveDevice& lveDevice;
-  std::unique_ptr<LveGPipeline> lveGPipeline;
-  VkPipelineLayout pipelineLayout;
+    std::mutex shaderReloadMutex = std::mutex();
+    LveDevice &lveDevice;
+    std::shared_ptr<VkRenderPass> renderPass;
+    std::unique_ptr<LvePipeline> lvePipeline;
+    VkPipelineLayout pipelineLayout;
 };
-} // namespace lve
+}  // namespace lve
