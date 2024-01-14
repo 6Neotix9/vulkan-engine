@@ -48,27 +48,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/neo/.local/lib/python3.11/site-packages/cmake/data/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /home/neo/.local/lib/python3.11/site-packages/cmake/data/bin/cmake -E rm -f
+RM = /usr/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/neo/Documents/projet-l3-mc5
+CMAKE_SOURCE_DIR = /home/neo/Documents/dev/vulkan-engine
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/neo/Documents/projet-l3-mc5/build
+CMAKE_BINARY_DIR = /home/neo/Documents/dev/vulkan-engine/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
-	/home/neo/.local/lib/python3.11/site-packages/cmake/data/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
+	/usr/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake to regenerate build system..."
-	/home/neo/.local/lib/python3.11/site-packages/cmake/data/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/neo/Documents/projet-l3-mc5/build/CMakeFiles /home/neo/Documents/projet-l3-mc5/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/neo/Documents/dev/vulkan-engine/build/CMakeFiles /home/neo/Documents/dev/vulkan-engine/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/neo/Documents/projet-l3-mc5/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/neo/Documents/dev/vulkan-engine/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -166,29 +166,29 @@ src/first_app.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/first_app.cpp.s
 .PHONY : src/first_app.cpp.s
 
-src/keyboard_mouvement_controller.o: src/keyboard_mouvement_controller.cpp.o
-.PHONY : src/keyboard_mouvement_controller.o
+src/keyboard_movement_controller.o: src/keyboard_movement_controller.cpp.o
+.PHONY : src/keyboard_movement_controller.o
 
 # target to build an object file
-src/keyboard_mouvement_controller.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/keyboard_mouvement_controller.cpp.o
-.PHONY : src/keyboard_mouvement_controller.cpp.o
+src/keyboard_movement_controller.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/keyboard_movement_controller.cpp.o
+.PHONY : src/keyboard_movement_controller.cpp.o
 
-src/keyboard_mouvement_controller.i: src/keyboard_mouvement_controller.cpp.i
-.PHONY : src/keyboard_mouvement_controller.i
+src/keyboard_movement_controller.i: src/keyboard_movement_controller.cpp.i
+.PHONY : src/keyboard_movement_controller.i
 
 # target to preprocess a source file
-src/keyboard_mouvement_controller.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/keyboard_mouvement_controller.cpp.i
-.PHONY : src/keyboard_mouvement_controller.cpp.i
+src/keyboard_movement_controller.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/keyboard_movement_controller.cpp.i
+.PHONY : src/keyboard_movement_controller.cpp.i
 
-src/keyboard_mouvement_controller.s: src/keyboard_mouvement_controller.cpp.s
-.PHONY : src/keyboard_mouvement_controller.s
+src/keyboard_movement_controller.s: src/keyboard_movement_controller.cpp.s
+.PHONY : src/keyboard_movement_controller.s
 
 # target to generate assembly for a file
-src/keyboard_mouvement_controller.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/keyboard_mouvement_controller.cpp.s
-.PHONY : src/keyboard_mouvement_controller.cpp.s
+src/keyboard_movement_controller.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/keyboard_movement_controller.cpp.s
+.PHONY : src/keyboard_movement_controller.cpp.s
 
 src/lve_buffer.o: src/lve_buffer.cpp.o
 .PHONY : src/lve_buffer.o
@@ -262,29 +262,29 @@ src/lve_camera.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_camera.cpp.s
 .PHONY : src/lve_camera.cpp.s
 
-src/lve_descriptor.o: src/lve_descriptor.cpp.o
-.PHONY : src/lve_descriptor.o
+src/lve_descriptors.o: src/lve_descriptors.cpp.o
+.PHONY : src/lve_descriptors.o
 
 # target to build an object file
-src/lve_descriptor.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_descriptor.cpp.o
-.PHONY : src/lve_descriptor.cpp.o
+src/lve_descriptors.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_descriptors.cpp.o
+.PHONY : src/lve_descriptors.cpp.o
 
-src/lve_descriptor.i: src/lve_descriptor.cpp.i
-.PHONY : src/lve_descriptor.i
+src/lve_descriptors.i: src/lve_descriptors.cpp.i
+.PHONY : src/lve_descriptors.i
 
 # target to preprocess a source file
-src/lve_descriptor.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_descriptor.cpp.i
-.PHONY : src/lve_descriptor.cpp.i
+src/lve_descriptors.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_descriptors.cpp.i
+.PHONY : src/lve_descriptors.cpp.i
 
-src/lve_descriptor.s: src/lve_descriptor.cpp.s
-.PHONY : src/lve_descriptor.s
+src/lve_descriptors.s: src/lve_descriptors.cpp.s
+.PHONY : src/lve_descriptors.s
 
 # target to generate assembly for a file
-src/lve_descriptor.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_descriptor.cpp.s
-.PHONY : src/lve_descriptor.cpp.s
+src/lve_descriptors.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_descriptors.cpp.s
+.PHONY : src/lve_descriptors.cpp.s
 
 src/lve_device.o: src/lve_device.cpp.o
 .PHONY : src/lve_device.o
@@ -310,30 +310,6 @@ src/lve_device.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_device.cpp.s
 .PHONY : src/lve_device.cpp.s
 
-src/lve_g_pipeline.o: src/lve_g_pipeline.cpp.o
-.PHONY : src/lve_g_pipeline.o
-
-# target to build an object file
-src/lve_g_pipeline.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_g_pipeline.cpp.o
-.PHONY : src/lve_g_pipeline.cpp.o
-
-src/lve_g_pipeline.i: src/lve_g_pipeline.cpp.i
-.PHONY : src/lve_g_pipeline.i
-
-# target to preprocess a source file
-src/lve_g_pipeline.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_g_pipeline.cpp.i
-.PHONY : src/lve_g_pipeline.cpp.i
-
-src/lve_g_pipeline.s: src/lve_g_pipeline.cpp.s
-.PHONY : src/lve_g_pipeline.s
-
-# target to generate assembly for a file
-src/lve_g_pipeline.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_g_pipeline.cpp.s
-.PHONY : src/lve_g_pipeline.cpp.s
-
 src/lve_game_object.o: src/lve_game_object.cpp.o
 .PHONY : src/lve_game_object.o
 
@@ -357,6 +333,54 @@ src/lve_game_object.s: src/lve_game_object.cpp.s
 src/lve_game_object.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_game_object.cpp.s
 .PHONY : src/lve_game_object.cpp.s
+
+src/lve_hot_reload.o: src/lve_hot_reload.cpp.o
+.PHONY : src/lve_hot_reload.o
+
+# target to build an object file
+src/lve_hot_reload.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_hot_reload.cpp.o
+.PHONY : src/lve_hot_reload.cpp.o
+
+src/lve_hot_reload.i: src/lve_hot_reload.cpp.i
+.PHONY : src/lve_hot_reload.i
+
+# target to preprocess a source file
+src/lve_hot_reload.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_hot_reload.cpp.i
+.PHONY : src/lve_hot_reload.cpp.i
+
+src/lve_hot_reload.s: src/lve_hot_reload.cpp.s
+.PHONY : src/lve_hot_reload.s
+
+# target to generate assembly for a file
+src/lve_hot_reload.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_hot_reload.cpp.s
+.PHONY : src/lve_hot_reload.cpp.s
+
+src/lve_image.o: src/lve_image.cpp.o
+.PHONY : src/lve_image.o
+
+# target to build an object file
+src/lve_image.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_image.cpp.o
+.PHONY : src/lve_image.cpp.o
+
+src/lve_image.i: src/lve_image.cpp.i
+.PHONY : src/lve_image.i
+
+# target to preprocess a source file
+src/lve_image.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_image.cpp.i
+.PHONY : src/lve_image.cpp.i
+
+src/lve_image.s: src/lve_image.cpp.s
+.PHONY : src/lve_image.s
+
+# target to generate assembly for a file
+src/lve_image.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_image.cpp.s
+.PHONY : src/lve_image.cpp.s
 
 src/lve_model.o: src/lve_model.cpp.o
 .PHONY : src/lve_model.o
@@ -382,53 +406,29 @@ src/lve_model.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_model.cpp.s
 .PHONY : src/lve_model.cpp.s
 
-src/lve_post_processing_manager.o: src/lve_post_processing_manager.cpp.o
-.PHONY : src/lve_post_processing_manager.o
+src/lve_pipeline.o: src/lve_pipeline.cpp.o
+.PHONY : src/lve_pipeline.o
 
 # target to build an object file
-src/lve_post_processing_manager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_post_processing_manager.cpp.o
-.PHONY : src/lve_post_processing_manager.cpp.o
+src/lve_pipeline.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o
+.PHONY : src/lve_pipeline.cpp.o
 
-src/lve_post_processing_manager.i: src/lve_post_processing_manager.cpp.i
-.PHONY : src/lve_post_processing_manager.i
-
-# target to preprocess a source file
-src/lve_post_processing_manager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_post_processing_manager.cpp.i
-.PHONY : src/lve_post_processing_manager.cpp.i
-
-src/lve_post_processing_manager.s: src/lve_post_processing_manager.cpp.s
-.PHONY : src/lve_post_processing_manager.s
-
-# target to generate assembly for a file
-src/lve_post_processing_manager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_post_processing_manager.cpp.s
-.PHONY : src/lve_post_processing_manager.cpp.s
-
-src/lve_pre_processing_manager.o: src/lve_pre_processing_manager.cpp.o
-.PHONY : src/lve_pre_processing_manager.o
-
-# target to build an object file
-src/lve_pre_processing_manager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pre_processing_manager.cpp.o
-.PHONY : src/lve_pre_processing_manager.cpp.o
-
-src/lve_pre_processing_manager.i: src/lve_pre_processing_manager.cpp.i
-.PHONY : src/lve_pre_processing_manager.i
+src/lve_pipeline.i: src/lve_pipeline.cpp.i
+.PHONY : src/lve_pipeline.i
 
 # target to preprocess a source file
-src/lve_pre_processing_manager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pre_processing_manager.cpp.i
-.PHONY : src/lve_pre_processing_manager.cpp.i
+src/lve_pipeline.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.i
+.PHONY : src/lve_pipeline.cpp.i
 
-src/lve_pre_processing_manager.s: src/lve_pre_processing_manager.cpp.s
-.PHONY : src/lve_pre_processing_manager.s
+src/lve_pipeline.s: src/lve_pipeline.cpp.s
+.PHONY : src/lve_pipeline.s
 
 # target to generate assembly for a file
-src/lve_pre_processing_manager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pre_processing_manager.cpp.s
-.PHONY : src/lve_pre_processing_manager.cpp.s
+src/lve_pipeline.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.s
+.PHONY : src/lve_pipeline.cpp.s
 
 src/lve_renderer.o: src/lve_renderer.cpp.o
 .PHONY : src/lve_renderer.o
@@ -478,29 +478,29 @@ src/lve_swap_chain.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.s
 .PHONY : src/lve_swap_chain.cpp.s
 
-src/lve_texture.o: src/lve_texture.cpp.o
-.PHONY : src/lve_texture.o
+src/lve_sync.o: src/lve_sync.cpp.o
+.PHONY : src/lve_sync.o
 
 # target to build an object file
-src/lve_texture.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_texture.cpp.o
-.PHONY : src/lve_texture.cpp.o
+src/lve_sync.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o
+.PHONY : src/lve_sync.cpp.o
 
-src/lve_texture.i: src/lve_texture.cpp.i
-.PHONY : src/lve_texture.i
+src/lve_sync.i: src/lve_sync.cpp.i
+.PHONY : src/lve_sync.i
 
 # target to preprocess a source file
-src/lve_texture.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_texture.cpp.i
-.PHONY : src/lve_texture.cpp.i
+src/lve_sync.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_sync.cpp.i
+.PHONY : src/lve_sync.cpp.i
 
-src/lve_texture.s: src/lve_texture.cpp.s
-.PHONY : src/lve_texture.s
+src/lve_sync.s: src/lve_sync.cpp.s
+.PHONY : src/lve_sync.s
 
 # target to generate assembly for a file
-src/lve_texture.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_texture.cpp.s
-.PHONY : src/lve_texture.cpp.s
+src/lve_sync.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_sync.cpp.s
+.PHONY : src/lve_sync.cpp.s
 
 src/lve_window.o: src/lve_window.cpp.o
 .PHONY : src/lve_window.o
@@ -550,365 +550,53 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/systems/computesSystems/shaderToySystem.o: src/systems/computesSystems/shaderToySystem.cpp.o
-.PHONY : src/systems/computesSystems/shaderToySystem.o
+src/systems/point_light_system.o: src/systems/point_light_system.cpp.o
+.PHONY : src/systems/point_light_system.o
 
 # target to build an object file
-src/systems/computesSystems/shaderToySystem.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/shaderToySystem.cpp.o
-.PHONY : src/systems/computesSystems/shaderToySystem.cpp.o
+src/systems/point_light_system.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o
+.PHONY : src/systems/point_light_system.cpp.o
 
-src/systems/computesSystems/shaderToySystem.i: src/systems/computesSystems/shaderToySystem.cpp.i
-.PHONY : src/systems/computesSystems/shaderToySystem.i
+src/systems/point_light_system.i: src/systems/point_light_system.cpp.i
+.PHONY : src/systems/point_light_system.i
 
 # target to preprocess a source file
-src/systems/computesSystems/shaderToySystem.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/shaderToySystem.cpp.i
-.PHONY : src/systems/computesSystems/shaderToySystem.cpp.i
+src/systems/point_light_system.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.i
+.PHONY : src/systems/point_light_system.cpp.i
 
-src/systems/computesSystems/shaderToySystem.s: src/systems/computesSystems/shaderToySystem.cpp.s
-.PHONY : src/systems/computesSystems/shaderToySystem.s
+src/systems/point_light_system.s: src/systems/point_light_system.cpp.s
+.PHONY : src/systems/point_light_system.s
 
 # target to generate assembly for a file
-src/systems/computesSystems/shaderToySystem.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/shaderToySystem.cpp.s
-.PHONY : src/systems/computesSystems/shaderToySystem.cpp.s
+src/systems/point_light_system.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.s
+.PHONY : src/systems/point_light_system.cpp.s
 
-src/systems/computesSystems/waveGenerationSystem.o: src/systems/computesSystems/waveGenerationSystem.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystem.o
+src/systems/simple_render_system.o: src/systems/simple_render_system.cpp.o
+.PHONY : src/systems/simple_render_system.o
 
 # target to build an object file
-src/systems/computesSystems/waveGenerationSystem.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystem.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystem.cpp.o
+src/systems/simple_render_system.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o
+.PHONY : src/systems/simple_render_system.cpp.o
 
-src/systems/computesSystems/waveGenerationSystem.i: src/systems/computesSystems/waveGenerationSystem.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystem.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystem.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystem.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystem.cpp.i
-
-src/systems/computesSystems/waveGenerationSystem.s: src/systems/computesSystems/waveGenerationSystem.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystem.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystem.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystem.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystem.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.o: src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.i: src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.i
+src/systems/simple_render_system.i: src/systems/simple_render_system.cpp.i
+.PHONY : src/systems/simple_render_system.i
 
 # target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.i
+src/systems/simple_render_system.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.i
+.PHONY : src/systems/simple_render_system.cpp.i
 
-src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.s: src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.o: src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.i: src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.i
-
-src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.s: src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.s
+src/systems/simple_render_system.s: src/systems/simple_render_system.cpp.s
+.PHONY : src/systems/simple_render_system.s
 
 # target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_Permute.o: src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Permute.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_Permute.i: src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Permute.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.i
-
-src/systems/computesSystems/waveGenerationSystems/wave_Permute.s: src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Permute.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Permute.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_Scale.o: src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Scale.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_Scale.i: src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Scale.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.i
-
-src/systems/computesSystems/waveGenerationSystems/wave_Scale.s: src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Scale.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_Scale.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.o: src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.i: src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.i
-
-src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.s: src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_conjugate.o: src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_conjugate.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_conjugate.i: src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_conjugate.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.i
-
-src/systems/computesSystems/waveGenerationSystems/wave_conjugate.s: src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_conjugate.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_conjugate.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_merge.o: src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_merge.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_merge.i: src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_merge.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.i
-
-src/systems/computesSystems/waveGenerationSystems/wave_merge.s: src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_merge.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_merge.cpp.s
-
-src/systems/computesSystems/waveGenerationSystems/wave_spectrum.o: src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_spectrum.o
-
-# target to build an object file
-src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.o
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.o
-
-src/systems/computesSystems/waveGenerationSystems/wave_spectrum.i: src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_spectrum.i
-
-# target to preprocess a source file
-src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.i
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.i
-
-src/systems/computesSystems/waveGenerationSystems/wave_spectrum.s: src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_spectrum.s
-
-# target to generate assembly for a file
-src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.s
-.PHONY : src/systems/computesSystems/waveGenerationSystems/wave_spectrum.cpp.s
-
-src/systems/graphicsSystems/point_light_system.o: src/systems/graphicsSystems/point_light_system.cpp.o
-.PHONY : src/systems/graphicsSystems/point_light_system.o
-
-# target to build an object file
-src/systems/graphicsSystems/point_light_system.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/point_light_system.cpp.o
-.PHONY : src/systems/graphicsSystems/point_light_system.cpp.o
-
-src/systems/graphicsSystems/point_light_system.i: src/systems/graphicsSystems/point_light_system.cpp.i
-.PHONY : src/systems/graphicsSystems/point_light_system.i
-
-# target to preprocess a source file
-src/systems/graphicsSystems/point_light_system.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/point_light_system.cpp.i
-.PHONY : src/systems/graphicsSystems/point_light_system.cpp.i
-
-src/systems/graphicsSystems/point_light_system.s: src/systems/graphicsSystems/point_light_system.cpp.s
-.PHONY : src/systems/graphicsSystems/point_light_system.s
-
-# target to generate assembly for a file
-src/systems/graphicsSystems/point_light_system.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/point_light_system.cpp.s
-.PHONY : src/systems/graphicsSystems/point_light_system.cpp.s
-
-src/systems/graphicsSystems/simple_render_system.o: src/systems/graphicsSystems/simple_render_system.cpp.o
-.PHONY : src/systems/graphicsSystems/simple_render_system.o
-
-# target to build an object file
-src/systems/graphicsSystems/simple_render_system.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/simple_render_system.cpp.o
-.PHONY : src/systems/graphicsSystems/simple_render_system.cpp.o
-
-src/systems/graphicsSystems/simple_render_system.i: src/systems/graphicsSystems/simple_render_system.cpp.i
-.PHONY : src/systems/graphicsSystems/simple_render_system.i
-
-# target to preprocess a source file
-src/systems/graphicsSystems/simple_render_system.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/simple_render_system.cpp.i
-.PHONY : src/systems/graphicsSystems/simple_render_system.cpp.i
-
-src/systems/graphicsSystems/simple_render_system.s: src/systems/graphicsSystems/simple_render_system.cpp.s
-.PHONY : src/systems/graphicsSystems/simple_render_system.s
-
-# target to generate assembly for a file
-src/systems/graphicsSystems/simple_render_system.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/simple_render_system.cpp.s
-.PHONY : src/systems/graphicsSystems/simple_render_system.cpp.s
-
-src/systems/graphicsSystems/sun_system.o: src/systems/graphicsSystems/sun_system.cpp.o
-.PHONY : src/systems/graphicsSystems/sun_system.o
-
-# target to build an object file
-src/systems/graphicsSystems/sun_system.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/sun_system.cpp.o
-.PHONY : src/systems/graphicsSystems/sun_system.cpp.o
-
-src/systems/graphicsSystems/sun_system.i: src/systems/graphicsSystems/sun_system.cpp.i
-.PHONY : src/systems/graphicsSystems/sun_system.i
-
-# target to preprocess a source file
-src/systems/graphicsSystems/sun_system.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/sun_system.cpp.i
-.PHONY : src/systems/graphicsSystems/sun_system.cpp.i
-
-src/systems/graphicsSystems/sun_system.s: src/systems/graphicsSystems/sun_system.cpp.s
-.PHONY : src/systems/graphicsSystems/sun_system.s
-
-# target to generate assembly for a file
-src/systems/graphicsSystems/sun_system.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/sun_system.cpp.s
-.PHONY : src/systems/graphicsSystems/sun_system.cpp.s
-
-src/systems/graphicsSystems/water_system.o: src/systems/graphicsSystems/water_system.cpp.o
-.PHONY : src/systems/graphicsSystems/water_system.o
-
-# target to build an object file
-src/systems/graphicsSystems/water_system.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/water_system.cpp.o
-.PHONY : src/systems/graphicsSystems/water_system.cpp.o
-
-src/systems/graphicsSystems/water_system.i: src/systems/graphicsSystems/water_system.cpp.i
-.PHONY : src/systems/graphicsSystems/water_system.i
-
-# target to preprocess a source file
-src/systems/graphicsSystems/water_system.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/water_system.cpp.i
-.PHONY : src/systems/graphicsSystems/water_system.cpp.i
-
-src/systems/graphicsSystems/water_system.s: src/systems/graphicsSystems/water_system.cpp.s
-.PHONY : src/systems/graphicsSystems/water_system.s
-
-# target to generate assembly for a file
-src/systems/graphicsSystems/water_system.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/graphicsSystems/water_system.cpp.s
-.PHONY : src/systems/graphicsSystems/water_system.cpp.s
-
-src/systems/pipeline_builder.o: src/systems/pipeline_builder.cpp.o
-.PHONY : src/systems/pipeline_builder.o
-
-# target to build an object file
-src/systems/pipeline_builder.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/pipeline_builder.cpp.o
-.PHONY : src/systems/pipeline_builder.cpp.o
-
-src/systems/pipeline_builder.i: src/systems/pipeline_builder.cpp.i
-.PHONY : src/systems/pipeline_builder.i
-
-# target to preprocess a source file
-src/systems/pipeline_builder.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/pipeline_builder.cpp.i
-.PHONY : src/systems/pipeline_builder.cpp.i
-
-src/systems/pipeline_builder.s: src/systems/pipeline_builder.cpp.s
-.PHONY : src/systems/pipeline_builder.s
-
-# target to generate assembly for a file
-src/systems/pipeline_builder.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/pipeline_builder.cpp.s
-.PHONY : src/systems/pipeline_builder.cpp.s
+src/systems/simple_render_system.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.s
+.PHONY : src/systems/simple_render_system.cpp.s
 
 # Help Target
 help:
@@ -923,9 +611,9 @@ help:
 	@echo "... src/first_app.o"
 	@echo "... src/first_app.i"
 	@echo "... src/first_app.s"
-	@echo "... src/keyboard_mouvement_controller.o"
-	@echo "... src/keyboard_mouvement_controller.i"
-	@echo "... src/keyboard_mouvement_controller.s"
+	@echo "... src/keyboard_movement_controller.o"
+	@echo "... src/keyboard_movement_controller.i"
+	@echo "... src/keyboard_movement_controller.s"
 	@echo "... src/lve_buffer.o"
 	@echo "... src/lve_buffer.i"
 	@echo "... src/lve_buffer.s"
@@ -935,87 +623,48 @@ help:
 	@echo "... src/lve_camera.o"
 	@echo "... src/lve_camera.i"
 	@echo "... src/lve_camera.s"
-	@echo "... src/lve_descriptor.o"
-	@echo "... src/lve_descriptor.i"
-	@echo "... src/lve_descriptor.s"
+	@echo "... src/lve_descriptors.o"
+	@echo "... src/lve_descriptors.i"
+	@echo "... src/lve_descriptors.s"
 	@echo "... src/lve_device.o"
 	@echo "... src/lve_device.i"
 	@echo "... src/lve_device.s"
-	@echo "... src/lve_g_pipeline.o"
-	@echo "... src/lve_g_pipeline.i"
-	@echo "... src/lve_g_pipeline.s"
 	@echo "... src/lve_game_object.o"
 	@echo "... src/lve_game_object.i"
 	@echo "... src/lve_game_object.s"
+	@echo "... src/lve_hot_reload.o"
+	@echo "... src/lve_hot_reload.i"
+	@echo "... src/lve_hot_reload.s"
+	@echo "... src/lve_image.o"
+	@echo "... src/lve_image.i"
+	@echo "... src/lve_image.s"
 	@echo "... src/lve_model.o"
 	@echo "... src/lve_model.i"
 	@echo "... src/lve_model.s"
-	@echo "... src/lve_post_processing_manager.o"
-	@echo "... src/lve_post_processing_manager.i"
-	@echo "... src/lve_post_processing_manager.s"
-	@echo "... src/lve_pre_processing_manager.o"
-	@echo "... src/lve_pre_processing_manager.i"
-	@echo "... src/lve_pre_processing_manager.s"
+	@echo "... src/lve_pipeline.o"
+	@echo "... src/lve_pipeline.i"
+	@echo "... src/lve_pipeline.s"
 	@echo "... src/lve_renderer.o"
 	@echo "... src/lve_renderer.i"
 	@echo "... src/lve_renderer.s"
 	@echo "... src/lve_swap_chain.o"
 	@echo "... src/lve_swap_chain.i"
 	@echo "... src/lve_swap_chain.s"
-	@echo "... src/lve_texture.o"
-	@echo "... src/lve_texture.i"
-	@echo "... src/lve_texture.s"
+	@echo "... src/lve_sync.o"
+	@echo "... src/lve_sync.i"
+	@echo "... src/lve_sync.s"
 	@echo "... src/lve_window.o"
 	@echo "... src/lve_window.i"
 	@echo "... src/lve_window.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/systems/computesSystems/shaderToySystem.o"
-	@echo "... src/systems/computesSystems/shaderToySystem.i"
-	@echo "... src/systems/computesSystems/shaderToySystem.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystem.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystem.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystem.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_InverseHFFT.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_InverseVFFT.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_Permute.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_Permute.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_Permute.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_Scale.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_Scale.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_Scale.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_TimeUpdate.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_conjugate.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_conjugate.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_conjugate.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_merge.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_merge.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_merge.s"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_spectrum.o"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_spectrum.i"
-	@echo "... src/systems/computesSystems/waveGenerationSystems/wave_spectrum.s"
-	@echo "... src/systems/graphicsSystems/point_light_system.o"
-	@echo "... src/systems/graphicsSystems/point_light_system.i"
-	@echo "... src/systems/graphicsSystems/point_light_system.s"
-	@echo "... src/systems/graphicsSystems/simple_render_system.o"
-	@echo "... src/systems/graphicsSystems/simple_render_system.i"
-	@echo "... src/systems/graphicsSystems/simple_render_system.s"
-	@echo "... src/systems/graphicsSystems/sun_system.o"
-	@echo "... src/systems/graphicsSystems/sun_system.i"
-	@echo "... src/systems/graphicsSystems/sun_system.s"
-	@echo "... src/systems/graphicsSystems/water_system.o"
-	@echo "... src/systems/graphicsSystems/water_system.i"
-	@echo "... src/systems/graphicsSystems/water_system.s"
-	@echo "... src/systems/pipeline_builder.o"
-	@echo "... src/systems/pipeline_builder.i"
-	@echo "... src/systems/pipeline_builder.s"
+	@echo "... src/systems/point_light_system.o"
+	@echo "... src/systems/point_light_system.i"
+	@echo "... src/systems/point_light_system.s"
+	@echo "... src/systems/simple_render_system.o"
+	@echo "... src/systems/simple_render_system.i"
+	@echo "... src/systems/simple_render_system.s"
 .PHONY : help
 
 

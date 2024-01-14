@@ -1,4 +1,4 @@
-# Install script for directory: /home/neo/Documents/dev/littleVulkanEngine
+# Install script for directory: /home/neo/Documents/dev/vulkan-engine
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/neo/Documents/dev/littleVulkanEngine/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/neo/Documents/dev/vulkan-engine/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
