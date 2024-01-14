@@ -51,12 +51,12 @@ void main() {
     vec3 halfAngle = normalize(directionToLight + viewDirection);
     float blinnTerm = dot(surfaceNormal, halfAngle);
     blinnTerm = clamp(blinnTerm, 0, 1);
-    blinnTerm = pow(blinnTerm, 64.0); // higher values -> sharper highlight
+    blinnTerm = pow(blinnTerm, 128.0); // higher values -> sharper highlight
     specularLight += intensity * blinnTerm;
   }
   vec3 imageColor = textureLod(image, fragUv, 0).rgb;
   
-  outColor = vec4(diffuseLight * imageColor * 1 + specularLight * imageColor*2, 1.0);
+  outColor = vec4(diffuseLight * imageColor + specularLight * imageColor, 1.0);
 
 
 }
