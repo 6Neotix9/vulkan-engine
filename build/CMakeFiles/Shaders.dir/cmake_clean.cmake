@@ -3,10 +3,6 @@ file(REMOVE_RECURSE
   "/home/neo/Documents/dev/vulkan-engine/shaders/point_light.vert.spv"
   "/home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.frag.spv"
   "/home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.vert.spv"
-  "/home/neo/Documents/dev/vulkan-engine/shaders/sun.frag.spv"
-  "/home/neo/Documents/dev/vulkan-engine/shaders/sun.vert.spv"
-  "/home/neo/Documents/dev/vulkan-engine/shaders/water.frag.spv"
-  "/home/neo/Documents/dev/vulkan-engine/shaders/water.vert.spv"
   "CMakeFiles/Shaders"
 )
 

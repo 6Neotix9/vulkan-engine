@@ -331,6 +331,7 @@ CMakeFiles/LveEngine.dir/src/first_app.cpp.o: \
  /home/neo/Documents/dev/vulkan-engine/src/keyboard_movement_controller.hpp \
  /home/neo/Documents/dev/vulkan-engine/src/lve_camera.hpp \
  /home/neo/Documents/dev/vulkan-engine/src/lve_image.hpp \
+ /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.hpp \
  /home/neo/Documents/dev/vulkan-engine/src/systems/point_light_system.hpp \
  /home/neo/Documents/dev/vulkan-engine/src/lve_frame_info.hpp \
  /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline.hpp \

@@ -23,6 +23,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/LveEngine.dir/src/lve_model.cpp.o.d"
   "CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o"
   "CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o.d"
+  "CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o"
+  "CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o.d"
   "CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o"
   "CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o.d"
   "CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o"

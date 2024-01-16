@@ -237,10 +237,24 @@ CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline.cpp -o CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.s
 
+CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o: CMakeFiles/LveEngine.dir/flags.make
+CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp
+CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o -MF CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o.d -o CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp
+
+CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp > CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.i
+
+CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp -o CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.s
+
 CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o: CMakeFiles/LveEngine.dir/flags.make
 CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp
 CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o -MF CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o.d -o CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp
 
 CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.i: cmake_force
@@ -254,7 +268,7 @@ CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.s: cmake_force
 CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o: CMakeFiles/LveEngine.dir/flags.make
 CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/lve_swap_chain.cpp
 CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o -MF CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o.d -o CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_swap_chain.cpp
 
 CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.i: cmake_force
@@ -268,7 +282,7 @@ CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.s: cmake_force
 CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o: CMakeFiles/LveEngine.dir/flags.make
 CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/lve_sync.cpp
 CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o -MF CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o.d -o CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_sync.cpp
 
 CMakeFiles/LveEngine.dir/src/lve_sync.cpp.i: cmake_force
@@ -282,7 +296,7 @@ CMakeFiles/LveEngine.dir/src/lve_sync.cpp.s: cmake_force
 CMakeFiles/LveEngine.dir/src/lve_window.cpp.o: CMakeFiles/LveEngine.dir/flags.make
 CMakeFiles/LveEngine.dir/src/lve_window.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/lve_window.cpp
 CMakeFiles/LveEngine.dir/src/lve_window.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_window.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/LveEngine.dir/src/lve_window.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/lve_window.cpp.o -MF CMakeFiles/LveEngine.dir/src/lve_window.cpp.o.d -o CMakeFiles/LveEngine.dir/src/lve_window.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_window.cpp
 
 CMakeFiles/LveEngine.dir/src/lve_window.cpp.i: cmake_force
@@ -296,7 +310,7 @@ CMakeFiles/LveEngine.dir/src/lve_window.cpp.s: cmake_force
 CMakeFiles/LveEngine.dir/src/main.cpp.o: CMakeFiles/LveEngine.dir/flags.make
 CMakeFiles/LveEngine.dir/src/main.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/main.cpp
 CMakeFiles/LveEngine.dir/src/main.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/LveEngine.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/LveEngine.dir/src/main.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/main.cpp.o -MF CMakeFiles/LveEngine.dir/src/main.cpp.o.d -o CMakeFiles/LveEngine.dir/src/main.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/main.cpp
 
 CMakeFiles/LveEngine.dir/src/main.cpp.i: cmake_force
@@ -310,7 +324,7 @@ CMakeFiles/LveEngine.dir/src/main.cpp.s: cmake_force
 CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o: CMakeFiles/LveEngine.dir/flags.make
 CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/systems/point_light_system.cpp
 CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o -MF CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o.d -o CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/point_light_system.cpp
 
 CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.i: cmake_force
@@ -324,7 +338,7 @@ CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.s: cmake_force
 CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o: CMakeFiles/LveEngine.dir/flags.make
 CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o: /home/neo/Documents/dev/vulkan-engine/src/systems/simple_render_system.cpp
 CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o: CMakeFiles/LveEngine.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o -MF CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o.d -o CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/simple_render_system.cpp
 
 CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.i: cmake_force
@@ -349,6 +363,7 @@ LveEngine_OBJECTS = \
 "CMakeFiles/LveEngine.dir/src/lve_image.cpp.o" \
 "CMakeFiles/LveEngine.dir/src/lve_model.cpp.o" \
 "CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o" \
+"CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o" \
 "CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o" \
 "CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o" \
 "CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o" \
@@ -372,6 +387,7 @@ LveEngine: CMakeFiles/LveEngine.dir/src/lve_hot_reload.cpp.o
 LveEngine: CMakeFiles/LveEngine.dir/src/lve_image.cpp.o
 LveEngine: CMakeFiles/LveEngine.dir/src/lve_model.cpp.o
 LveEngine: CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o
+LveEngine: CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o
 LveEngine: CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o
 LveEngine: CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o
 LveEngine: CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o
@@ -383,7 +399,7 @@ LveEngine: CMakeFiles/LveEngine.dir/build.make
 LveEngine: /usr/lib/libglfw.so.3.3
 LveEngine: /lib/libvulkan.so
 LveEngine: CMakeFiles/LveEngine.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Linking CXX executable LveEngine"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX executable LveEngine"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/LveEngine.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

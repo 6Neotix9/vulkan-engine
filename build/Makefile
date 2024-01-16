@@ -430,6 +430,30 @@ src/lve_pipeline.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.s
 .PHONY : src/lve_pipeline.cpp.s
 
+src/lve_pipeline_ressources.o: src/lve_pipeline_ressources.cpp.o
+.PHONY : src/lve_pipeline_ressources.o
+
+# target to build an object file
+src/lve_pipeline_ressources.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o
+.PHONY : src/lve_pipeline_ressources.cpp.o
+
+src/lve_pipeline_ressources.i: src/lve_pipeline_ressources.cpp.i
+.PHONY : src/lve_pipeline_ressources.i
+
+# target to preprocess a source file
+src/lve_pipeline_ressources.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.i
+.PHONY : src/lve_pipeline_ressources.cpp.i
+
+src/lve_pipeline_ressources.s: src/lve_pipeline_ressources.cpp.s
+.PHONY : src/lve_pipeline_ressources.s
+
+# target to generate assembly for a file
+src/lve_pipeline_ressources.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LveEngine.dir/build.make CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.s
+.PHONY : src/lve_pipeline_ressources.cpp.s
+
 src/lve_renderer.o: src/lve_renderer.cpp.o
 .PHONY : src/lve_renderer.o
 
@@ -644,6 +668,9 @@ help:
 	@echo "... src/lve_pipeline.o"
 	@echo "... src/lve_pipeline.i"
 	@echo "... src/lve_pipeline.s"
+	@echo "... src/lve_pipeline_ressources.o"
+	@echo "... src/lve_pipeline_ressources.i"
+	@echo "... src/lve_pipeline_ressources.s"
 	@echo "... src/lve_renderer.o"
 	@echo "... src/lve_renderer.i"
 	@echo "... src/lve_renderer.s"

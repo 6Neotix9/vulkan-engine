@@ -8,6 +8,8 @@
 #include "lve_buffer.hpp"
 #include "lve_camera.hpp"
 #include "lve_image.hpp"
+#include "lve_pipeline_ressources.hpp"
+#include "lve_swap_chain.hpp"
 #include "systems/point_light_system.hpp"
 #include "systems/simple_render_system.hpp"
 
@@ -54,6 +56,16 @@ void FirstApp::run() {
     imageCreateInfo.usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT;
     imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
     LveImage image{lveDevice, imageCreateInfo};
+
+
+    PipelineRessourcesCreateInfo test{};
+    test.colorAttachments = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_UINT, VK_FORMAT_R32G32B32_UINT};
+    test.depthAttachements = {VK_FORMAT_D32_SFLOAT};
+    test.numberOfImage = LveSwapChain::MAX_FRAMES_IN_FLIGHT;
+    test.widht = 1280;
+    test.height = 720;
+
+    LvePipelineRessources t {test, lveDevice};
 
     std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
     for (int i = 0; i < uboBuffers.size(); i++) {

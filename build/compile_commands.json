@@ -73,6 +73,12 @@
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
+  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp",
+  "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp",
+  "output": "CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o"
+},
+{
+  "directory": "/home/neo/Documents/dev/vulkan-engine/build",
   "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o"

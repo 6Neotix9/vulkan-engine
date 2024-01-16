@@ -20,6 +20,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/neo/Documents/dev/vulkan-engine/src/lve_image.cpp" "CMakeFiles/LveEngine.dir/src/lve_image.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_image.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/lve_model.cpp" "CMakeFiles/LveEngine.dir/src/lve_model.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_model.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/lve_pipeline.cpp" "CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o.d"
+  "/home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp" "CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp" "CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/lve_swap_chain.cpp" "CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/lve_sync.cpp" "CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o.d"

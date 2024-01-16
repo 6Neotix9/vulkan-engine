@@ -70,10 +70,6 @@ CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/point_light.fr
 CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/point_light.vert.spv
 CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.frag.spv
 CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.vert.spv
-CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/sun.frag.spv
-CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/sun.vert.spv
-CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/water.frag.spv
-CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/water.vert.spv
 
 /home/neo/Documents/dev/vulkan-engine/shaders/point_light.frag.spv: /home/neo/Documents/dev/vulkan-engine/shaders/point_light.frag
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating /home/neo/Documents/dev/vulkan-engine/shaders/point_light.frag.spv"
@@ -91,31 +87,11 @@ CMakeFiles/Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/water.vert.spv
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating /home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.vert.spv"
 	/usr/bin/glslangValidator -V /home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.vert -o /home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.vert.spv
 
-/home/neo/Documents/dev/vulkan-engine/shaders/sun.frag.spv: /home/neo/Documents/dev/vulkan-engine/shaders/sun.frag
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Generating /home/neo/Documents/dev/vulkan-engine/shaders/sun.frag.spv"
-	/usr/bin/glslangValidator -V /home/neo/Documents/dev/vulkan-engine/shaders/sun.frag -o /home/neo/Documents/dev/vulkan-engine/shaders/sun.frag.spv
-
-/home/neo/Documents/dev/vulkan-engine/shaders/sun.vert.spv: /home/neo/Documents/dev/vulkan-engine/shaders/sun.vert
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Generating /home/neo/Documents/dev/vulkan-engine/shaders/sun.vert.spv"
-	/usr/bin/glslangValidator -V /home/neo/Documents/dev/vulkan-engine/shaders/sun.vert -o /home/neo/Documents/dev/vulkan-engine/shaders/sun.vert.spv
-
-/home/neo/Documents/dev/vulkan-engine/shaders/water.frag.spv: /home/neo/Documents/dev/vulkan-engine/shaders/water.frag
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Generating /home/neo/Documents/dev/vulkan-engine/shaders/water.frag.spv"
-	/usr/bin/glslangValidator -V /home/neo/Documents/dev/vulkan-engine/shaders/water.frag -o /home/neo/Documents/dev/vulkan-engine/shaders/water.frag.spv
-
-/home/neo/Documents/dev/vulkan-engine/shaders/water.vert.spv: /home/neo/Documents/dev/vulkan-engine/shaders/water.vert
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/neo/Documents/dev/vulkan-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Generating /home/neo/Documents/dev/vulkan-engine/shaders/water.vert.spv"
-	/usr/bin/glslangValidator -V /home/neo/Documents/dev/vulkan-engine/shaders/water.vert -o /home/neo/Documents/dev/vulkan-engine/shaders/water.vert.spv
-
 Shaders: CMakeFiles/Shaders
 Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/point_light.frag.spv
 Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/point_light.vert.spv
 Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.frag.spv
 Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/simple_shader.vert.spv
-Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/sun.frag.spv
-Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/sun.vert.spv
-Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/water.frag.spv
-Shaders: /home/neo/Documents/dev/vulkan-engine/shaders/water.vert.spv
 Shaders: CMakeFiles/Shaders.dir/build.make
 .PHONY : Shaders
 
