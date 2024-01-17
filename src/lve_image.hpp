@@ -39,6 +39,7 @@ class LveImage{
         VkImageLayout getVkImageLayout() const { return imageLayout; }
         int32_t getWidth() const { return width; }
         int32_t getHeight() const { return height; }
+        VkFormat getFormat() const { return imageFormat; }
 
         // Static Functions
         static void copyImage(LveDevice& device, LveImage &srcImage, LveImage &dstImage);

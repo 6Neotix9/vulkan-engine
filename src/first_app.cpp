@@ -59,7 +59,7 @@ void FirstApp::run() {
 
 
     PipelineRessourcesCreateInfo test{};
-    test.colorAttachments = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_UINT, VK_FORMAT_R32G32B32_UINT};
+    test.colorAttachments = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_R16G16B16A16_SNORM};
     test.depthAttachements = {VK_FORMAT_D32_SFLOAT};
     test.numberOfImage = LveSwapChain::MAX_FRAMES_IN_FLIGHT;
     test.widht = 1280;

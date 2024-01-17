@@ -80,13 +80,16 @@ void LveImage::createImageView(ImageCreateInfo& imageCreateInfo) {
     imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;  // VK_IMAGE_VIEW_TYPE_2D
     imageViewInfo.format = imageFormat;
-    imageViewInfo.components = {
-        VK_COMPONENT_SWIZZLE_R,
-        VK_COMPONENT_SWIZZLE_G,
-        VK_COMPONENT_SWIZZLE_B,
-        VK_COMPONENT_SWIZZLE_A};  // VK_COMPONENT_SWIZZLE_IDENTITY
+    // imageViewInfo.components = {
+    //     VK_COMPONENT_SWIZZLE_R,
+    //     VK_COMPONENT_SWIZZLE_G,
+    //     VK_COMPONENT_SWIZZLE_B,
+    //     VK_COMPONENT_SWIZZLE_A};  // VK_COMPONENT_SWIZZLE_IDENTITY
     imageViewInfo.subresourceRange.aspectMask =
         VK_IMAGE_ASPECT_COLOR_BIT;  // VK_IMAGE_ASPECT_COLOR_BIT
+    if (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+        imageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    }
     imageViewInfo.subresourceRange.baseMipLevel = 0;
     imageViewInfo.subresourceRange.baseArrayLayer = 0;
     imageViewInfo.subresourceRange.layerCount = 1;
