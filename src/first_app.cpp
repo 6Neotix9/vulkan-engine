@@ -60,9 +60,9 @@ void FirstApp::run() {
 
     PipelineRessourcesCreateInfo test{};
     test.colorAttachments = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_R16G16B16A16_SNORM};
-    test.depthAttachements = {VK_FORMAT_D32_SFLOAT};
+    test.hasDepthAttachement = true;
     test.numberOfImage = LveSwapChain::MAX_FRAMES_IN_FLIGHT;
-    test.widht = 1280;
+    test.width = 1280;
     test.height = 720;
 
     LvePipelineRessources t {test, lveDevice};

@@ -14,9 +14,14 @@ namespace lve {
 struct PipelineRessourcesCreateInfo {
     std::vector<VkFormat> colorAttachments;
     bool hasDepthAttachement;
-    uint32_t widht;
+    uint32_t width;
     uint32_t height;
     int numberOfImage;
+};
+
+struct ImagesAttachment {
+    std::vector<std::shared_ptr<LveImage>> colorImage;
+    std::shared_ptr<LveImage> depthImage;
 };
 
 class LvePipelineRessources {
@@ -31,10 +36,11 @@ class LvePipelineRessources {
     void createRenderPass(PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo);
     void createFrameBuffer(PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo);
 
-    std::shared_ptr<VkRenderPass> renderPass;
+    VkRenderPass renderPass;
+    VkRenderPass oldRenderPass;
     std::vector<VkFramebuffer> frameBuffer;
-    std::vector<std::shared_ptr<LveImage>> colorImage;
-    std::shared_ptr<LveImage> depthImage;
+    std::vector<ImagesAttachment> imagesAttachments;
+
     LveDevice &lveDevice;
 };
 
