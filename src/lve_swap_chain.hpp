@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lve_device.hpp"
+#include "lve_pipeline_ressources.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.h>
@@ -26,8 +27,8 @@ class LveSwapChain {
   LveSwapChain(const LveSwapChain &) = delete;
   LveSwapChain &operator=(const LveSwapChain &) = delete;
 
-  VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
-  VkRenderPass getRenderPass() { return *renderPass; }
+  VkFramebuffer getFrameBuffer(int index) { return pipelineRessources->getFrameBuffer(index); }
+  VkRenderPass getRenderPass() { return pipelineRessources->getRenderPass(); }
   VkImageView getImageView(int index) { return swapChainImageViews[index]; }
   size_t imageCount() { return swapChainImages.size(); }
   VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
@@ -49,12 +50,9 @@ class LveSwapChain {
   }
 
  private:
-  void init();
+  void init(std::shared_ptr<VkRenderPass> renderPass);
   void createSwapChain();
   void createImageViews();
-  void createDepthResources();
-  void createRenderPass();
-  void createFramebuffers();
   void createSyncObjects();
 
   // Helper functions
@@ -68,13 +66,7 @@ class LveSwapChain {
   VkFormat swapChainDepthFormat;
   VkExtent2D swapChainExtent;
 
-  std::vector<VkFramebuffer> swapChainFramebuffers;
-  std::shared_ptr<VkRenderPass> renderPass;
-  VkRenderPass oldRenderPass;
 
-  std::vector<VkImage> depthImages;
-  std::vector<VkDeviceMemory> depthImageMemorys;
-  std::vector<VkImageView> depthImageViews;
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;
 
@@ -89,6 +81,8 @@ class LveSwapChain {
   std::vector<VkFence> inFlightFences;
   std::vector<VkFence> imagesInFlight;
   size_t currentFrame = 0;
+
+  std::shared_ptr<LvePipelineRessources> pipelineRessources;
 };
 
 }  // namespace lve

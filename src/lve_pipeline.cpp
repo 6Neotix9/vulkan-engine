@@ -1,4 +1,5 @@
 #include "lve_pipeline.hpp"
+#include <vulkan/vulkan_core.h>
 
 #include "lve_model.hpp"
 
@@ -152,8 +153,8 @@ void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
   configInfo.rasterizationInfo.rasterizerDiscardEnable = VK_FALSE;
   configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
   configInfo.rasterizationInfo.lineWidth = 1.0f;
-  configInfo.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
-  configInfo.rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+  configInfo.rasterizationInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+  configInfo.rasterizationInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
   configInfo.rasterizationInfo.depthBiasEnable = VK_FALSE;
   configInfo.rasterizationInfo.depthBiasConstantFactor = 0.0f;  // Optional
   configInfo.rasterizationInfo.depthBiasClamp = 0.0f;           // Optional
@@ -181,7 +182,7 @@ void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
   configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
   configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;
   configInfo.colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional
-  configInfo.colorBlendInfo.attachmentCount = 1;
+  configInfo.colorBlendInfo.attachmentCount = 2;
   configInfo.colorBlendInfo.pAttachments = &configInfo.colorBlendAttachment;
   configInfo.colorBlendInfo.blendConstants[0] = 0.0f;  // Optional
   configInfo.colorBlendInfo.blendConstants[1] = 0.0f;  // Optional

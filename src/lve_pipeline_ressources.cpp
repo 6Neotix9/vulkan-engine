@@ -4,6 +4,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -14,14 +15,19 @@
 namespace lve {
 
 LvePipelineRessources::LvePipelineRessources(
-    PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo, LveDevice &lveDevice)
-    : lveDevice(lveDevice) {
+    LveDevice &lveDevice, PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo)
+    : lveDevice(lveDevice), renderPass(pipelineRessourcesCreateInfo.renderPass) {
     createAttachementImage(pipelineRessourcesCreateInfo);
     createRenderPass(pipelineRessourcesCreateInfo);
     createFrameBuffer(pipelineRessourcesCreateInfo);
 }
 
-LvePipelineRessources::~LvePipelineRessources() {}
+LvePipelineRessources::~LvePipelineRessources() {
+    for (auto framebuffer : frameBuffer) {
+        vkDestroyFramebuffer(lveDevice.device(), framebuffer, nullptr);
+    }
+    vkDestroyRenderPass(lveDevice.device(), oldRenderPass, nullptr);
+}
 
 void LvePipelineRessources::createAttachementImage(
     PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo) {
@@ -47,9 +53,9 @@ void LvePipelineRessources::createAttachementImage(
             imageCreateInfo.width = pipelineRessourcesCreateInfo.width;
             imageCreateInfo.height = pipelineRessourcesCreateInfo.height;
 
-            imagesAttachment.depthImage =  std::make_shared<LveImage>(lveDevice, imageCreateInfo);
+            imagesAttachment.depthImage = std::make_shared<LveImage>(lveDevice, imageCreateInfo);
         }
-        
+
         imagesAttachments.push_back(imagesAttachment);
     }
 }
@@ -57,6 +63,20 @@ void LvePipelineRessources::createAttachementImage(
 void LvePipelineRessources::createRenderPass(
     PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo) {
     std::vector<VkAttachmentDescription> attachments;
+
+    for (auto externalAttachement : pipelineRessourcesCreateInfo.externalAttachments) {
+        VkAttachmentDescription externalAttachment = {};
+        externalAttachment.format = externalAttachement.imageformat;
+        externalAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        externalAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        externalAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        externalAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        externalAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        externalAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        externalAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        attachments.push_back(externalAttachment);
+    }
+
     for (auto colorAttachement : pipelineRessourcesCreateInfo.colorAttachments) {
         VkAttachmentDescription colorAttachment = {};
         colorAttachment.format = colorAttachement;
@@ -84,9 +104,12 @@ void LvePipelineRessources::createRenderPass(
     }
 
     std::vector<VkAttachmentReference> colorAttachmentRef;
+    // for (uint32_t i = 0; i < pipelineRessourcesCreateInfo.externalAttachments.size(); i++) {
+    //     colorAttachmentRef.push_back({i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL});
+    // }
 
-    for (int i = 0; i < attachments.size() - 1; i++) {
-        colorAttachmentRef.push_back({1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL});
+    for (uint32_t i = 0; i < attachments.size() - 1; i++) {
+        colorAttachmentRef.push_back({i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL});
     }
 
     VkAttachmentReference depthAttachmentRef{};
@@ -128,36 +151,38 @@ void LvePipelineRessources::createRenderPass(
         VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
-    renderPass = oldRenderPass;
+    *renderPass = oldRenderPass;
 }
 void LvePipelineRessources::createFrameBuffer(
     PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo) {
     frameBuffer.resize(pipelineRessourcesCreateInfo.numberOfImage);
-   
 
     for (size_t i = 0; i < pipelineRessourcesCreateInfo.numberOfImage; i++) {
-         std::vector<VkImageView> attachments{};
-        for (auto colorAttachment : imagesAttachments[i].colorImage){
+        std::vector<VkImageView> attachments{};
+
+        for (auto externalAttachement : pipelineRessourcesCreateInfo.externalAttachments) {
+            attachments.push_back(externalAttachement.imageView[i]);
+        }
+
+        for (auto colorAttachment : imagesAttachments[i].colorImage) {
             attachments.push_back(colorAttachment->getVkImageView());
         }
-        if (pipelineRessourcesCreateInfo.hasDepthAttachement){
+
+        if (pipelineRessourcesCreateInfo.hasDepthAttachement) {
             attachments.push_back(imagesAttachments[i].depthImage->getVkImageView());
         }
-        
+
         VkFramebufferCreateInfo framebufferInfo = {};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.renderPass = *renderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
         framebufferInfo.width = pipelineRessourcesCreateInfo.width;
         framebufferInfo.height = pipelineRessourcesCreateInfo.height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(
-                lveDevice.device(),
-                &framebufferInfo,
-                nullptr,
-                &frameBuffer[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(lveDevice.device(), &framebufferInfo, nullptr, &frameBuffer[i]) !=
+            VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
