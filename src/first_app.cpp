@@ -98,8 +98,9 @@ void FirstApp::run() {
 
     SimpleRenderSystem simpleRenderSystem{
         lveDevice,
-        lveRenderer.renderPass,
+        lveRenderer.getSwapchainPipeLineRessources(),
         globalSetLayout->getDescriptorSetLayout()};
+
     PointLightSystem pointLightSystem{
         lveDevice,
         lveRenderer.renderPass,

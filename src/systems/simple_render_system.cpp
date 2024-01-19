@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include "../lve_hot_reload.hpp"
+#include "lve_pipeline_ressources.hpp"
 
 
 // libs
@@ -24,10 +25,10 @@ struct SimplePushConstantData {
 };
 
 SimpleRenderSystem::SimpleRenderSystem(
-    LveDevice& device, std::shared_ptr<VkRenderPass> renderPass, VkDescriptorSetLayout globalSetLayout)
-    : lveDevice{device}, renderPass{renderPass} {
+    LveDevice& device, std::shared_ptr<LvePipelineRessources> pipelineRessources, VkDescriptorSetLayout globalSetLayout)
+    : lveDevice{device}, pipelineRessources{pipelineRessources} {
     createPipelineLayout(globalSetLayout);
-    createPipeline(*renderPass.get());
+    createPipeline();
     LveHotReload::getInstance()->addShader("simple_shader", this);
 }
 
@@ -57,12 +58,13 @@ void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLay
     }
 }
 
-void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
+void SimpleRenderSystem::createPipeline() {
     assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
     PipelineConfigInfo pipelineConfig{};
+    pipelineConfig.pipelineRessource = pipelineRessources;
     LvePipeline::defaultPipelineConfigInfo(pipelineConfig);
-    pipelineConfig.renderPass = renderPass;
+    pipelineConfig.renderPass = pipelineRessources->getRenderPass();
     pipelineConfig.pipelineLayout = pipelineLayout;
     lvePipeline = std::make_unique<LvePipeline>(
         lveDevice,
@@ -73,7 +75,7 @@ void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
 
 void SimpleRenderSystem::reloadShaders() {
     lveDevice.stopRendering();
-    this->createPipeline(*renderPass.get());
+    this->createPipeline();
     lveDevice.startRendering();
 
 }

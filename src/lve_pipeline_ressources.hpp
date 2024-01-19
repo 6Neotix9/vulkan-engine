@@ -40,7 +40,10 @@ class LvePipelineRessources {
 
     //getters
     VkRenderPass getRenderPass() { return *renderPass; }
+    std::shared_ptr<VkRenderPass> getRenderPassPtr() {return renderPass;}
     VkFramebuffer getFrameBuffer(int index) { return frameBuffer[index]; }
+    std::vector<std::shared_ptr<LveImage>> getImageColorAttachments(){return imagesAttachments[0].colorImage;}
+
     
 
    private:

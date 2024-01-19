@@ -1,8 +1,11 @@
 #pragma once
 
+#include <vulkan/vulkan_core.h>
 #include "lve_device.hpp"
+#include "lve_pipeline_ressources.hpp"
 
 // std
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -19,12 +22,13 @@ struct PipelineConfigInfo {
   VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
   VkPipelineRasterizationStateCreateInfo rasterizationInfo;
   VkPipelineMultisampleStateCreateInfo multisampleInfo;
-  VkPipelineColorBlendAttachmentState colorBlendAttachment;
+  std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachment;
   VkPipelineColorBlendStateCreateInfo colorBlendInfo;
   VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
   std::vector<VkDynamicState> dynamicStateEnables;
   VkPipelineDynamicStateCreateInfo dynamicStateInfo;
   VkPipelineLayout pipelineLayout = nullptr;
+  std::shared_ptr<LvePipelineRessources> pipelineRessource;
   VkRenderPass renderPass = nullptr;
   uint32_t subpass = 0;
 };

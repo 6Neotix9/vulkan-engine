@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan_core.h>
 #include "lve_device.hpp"
+#include "lve_pipeline_ressources.hpp"
 #include "lve_swap_chain.hpp"
 #include "lve_window.hpp"
 
@@ -19,7 +20,7 @@ class LveRenderer {
   LveRenderer(const LveRenderer &) = delete;
   LveRenderer &operator=(const LveRenderer &) = delete;
 
-  VkRenderPass getSwapChainRenderPass() const { return lveSwapChain->getRenderPass(); }
+  std::shared_ptr<LvePipelineRessources> getSwapchainPipeLineRessources(){return lveSwapChain->getPipelineRessources();}
   float getAspectRatio() const { return lveSwapChain->extentAspectRatio(); }
   bool isFrameInProgress() const { return isFrameStarted; }
 

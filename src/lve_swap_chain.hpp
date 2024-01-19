@@ -28,13 +28,13 @@ class LveSwapChain {
   LveSwapChain &operator=(const LveSwapChain &) = delete;
 
   VkFramebuffer getFrameBuffer(int index) { return pipelineRessources->getFrameBuffer(index); }
-  VkRenderPass getRenderPass() { return pipelineRessources->getRenderPass(); }
   VkImageView getImageView(int index) { return swapChainImageViews[index]; }
   size_t imageCount() { return swapChainImages.size(); }
   VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
   VkExtent2D getSwapChainExtent() { return swapChainExtent; }
   uint32_t width() { return swapChainExtent.width; }
   uint32_t height() { return swapChainExtent.height; }
+  std::shared_ptr<LvePipelineRessources> getPipelineRessources(){return pipelineRessources;}
 
   float extentAspectRatio() {
     return static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);

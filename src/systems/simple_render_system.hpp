@@ -15,7 +15,7 @@ namespace lve {
 class SimpleRenderSystem : public LveISystem {
    public:
     SimpleRenderSystem(
-        LveDevice &device, std::shared_ptr<VkRenderPass> renderPass, VkDescriptorSetLayout globalSetLayout);
+        LveDevice &device, std::shared_ptr<LvePipelineRessources> pipelineRessources, VkDescriptorSetLayout globalSetLayout);
     ~SimpleRenderSystem();
 
     SimpleRenderSystem(const SimpleRenderSystem &) = delete;
@@ -27,11 +27,11 @@ class SimpleRenderSystem : public LveISystem {
 
    private:
     void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-    void createPipeline(VkRenderPass renderPass);
+    void createPipeline();
 
     std::mutex shaderReloadMutex = std::mutex();
     LveDevice &lveDevice;
-    std::shared_ptr<VkRenderPass> renderPass;
+    std::shared_ptr<LvePipelineRessources> pipelineRessources;
     std::unique_ptr<LvePipeline> lvePipeline;
     VkPipelineLayout pipelineLayout;
 };
