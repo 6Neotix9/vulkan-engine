@@ -27,7 +27,7 @@ class LveImage{
 
     public:
         // Functions
-        LveImage(LveDevice& device, ImageCreateInfo& imageCreateInfo);
+        LveImage(LveDevice* device, ImageCreateInfo& imageCreateInfo);
         ~LveImage();
         void transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout, VkCommandBuffer commandBuffer);
         void transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout, u_int32_t mipLevel, u_int32_t mipCount, VkCommandBuffer commandBuffer);
@@ -48,7 +48,7 @@ class LveImage{
         int32_t width = 0;
         int32_t height = 0;
         uint32_t mipLevels = 1;
-        LveDevice& lveDevice;
+        LveDevice* lveDevice;
         VkImage image = VK_NULL_HANDLE;
         VkDeviceMemory imageMemory = VK_NULL_HANDLE;
         VkImageView imageView = VK_NULL_HANDLE;

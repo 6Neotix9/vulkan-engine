@@ -14,16 +14,16 @@
 namespace lve {
 class LveRenderer {
  public:
-  LveRenderer(LveWindow &window, LveDevice &device);
+  LveRenderer(LveWindow &window, LveDevice *device);
   ~LveRenderer();
 
   LveRenderer(const LveRenderer &) = delete;
   LveRenderer &operator=(const LveRenderer &) = delete;
 
-  std::shared_ptr<LvePipelineRessources> getSwapchainPipeLineRessources(){return lveSwapChain->getPipelineRessources();}
+  std::shared_ptr<LvePipelineRessources> getSwapchainPipeLineRessources(){return pipelineRessources;}
   float getAspectRatio() const { return lveSwapChain->extentAspectRatio(); }
   bool isFrameInProgress() const { return isFrameStarted; }
-
+VkExtent2D getSwapChainExtent() const { return lveSwapChain->getSwapChainExtent(); }
   VkCommandBuffer getCurrentCommandBuffer() const {
     assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
     return commandBuffers[currentFrameIndex];
@@ -39,7 +39,7 @@ class LveRenderer {
   void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
   void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
-  std::shared_ptr<VkRenderPass> renderPass;
+  
 
  private:
   void createCommandBuffers();
@@ -47,9 +47,10 @@ class LveRenderer {
   void recreateSwapChain();
 
   LveWindow &lveWindow;
-  LveDevice &lveDevice;
+  LveDevice *lveDevice;
   std::unique_ptr<LveSwapChain> lveSwapChain;
   std::vector<VkCommandBuffer> commandBuffers;
+  std::shared_ptr<LvePipelineRessources> pipelineRessources;
 
   uint32_t currentImageIndex;
   int currentFrameIndex{0};

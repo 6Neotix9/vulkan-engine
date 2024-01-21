@@ -1,6 +1,7 @@
 #include "lve_hot_reload.hpp"
 
 #include <iostream>
+#include "systems/lve_A_system.hpp"
 
 namespace lve {
 
@@ -10,7 +11,7 @@ static void on_file_change_static(
 }
 
 LveHotReload::LveHotReload() {
-    shaderMap = std::map<std::string, LveISystem*>();
+    shaderMap = std::map<std::string, LveASystem*>();
     uv_loop_init(&loop);
 
     uv_fs_event_init(&loop, &fs_event);
@@ -37,7 +38,7 @@ LveHotReload::~LveHotReload() {
     uv_loop_close(&loop);
 }
 
-void LveHotReload::addShader(std::string name, LveISystem* shader) {
+void LveHotReload::addShader(std::string name, LveASystem* shader) {
     shaderMap.insert({name, shader});
 }
 

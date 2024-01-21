@@ -1,5 +1,6 @@
 #include "point_light_system.hpp"
-#include "../lve_hot_reload.hpp"
+#include <vector>
+
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -22,24 +23,18 @@ struct PointLightPushConstants {
 };
 
 PointLightSystem::PointLightSystem(
-    LveDevice& device, std::shared_ptr<VkRenderPass> renderPass, VkDescriptorSetLayout globalSetLayout)
-    : lveDevice{device}, renderPass{renderPass} {
-    createPipelineLayout(globalSetLayout);
-    createPipeline(*renderPass.get());
-    LveHotReload::getInstance()->addShader("point_light", this);
+    LveDevice& device, std::shared_ptr<LvePipelineRessources> pipelineRessources, VkDescriptorSetLayout globalSetLayout)
+    : LveASystem(device, "point_light", pipelineRessources, std::vector<VkDescriptorSetLayout>{globalSetLayout}){
+    createPipelineLayout(std::vector<VkDescriptorSetLayout>{globalSetLayout});
+    createPipeline();
 }
 
 PointLightSystem::~PointLightSystem() {
-    vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr);
 }
 
-void PointLightSystem::reloadShaders() {
-    lveDevice.stopRendering();
-    this->createPipeline(*renderPass.get());
-    lveDevice.startRendering();
-}
 
-void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+
+void PointLightSystem::createPipelineLayout(std::vector<VkDescriptorSetLayout> globalSetLayout) {
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
@@ -59,15 +54,16 @@ void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayou
     }
 }
 
-void PointLightSystem::createPipeline(VkRenderPass renderPass) {
+void PointLightSystem::createPipeline() {
     assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
     PipelineConfigInfo pipelineConfig{};
+    pipelineConfig.pipelineRessource = pipelineRessources;
     LvePipeline::defaultPipelineConfigInfo(pipelineConfig);
     LvePipeline::enableAlphaBlending(pipelineConfig);
     pipelineConfig.attributeDescriptions.clear();
     pipelineConfig.bindingDescriptions.clear();
-    pipelineConfig.renderPass = renderPass;
+    pipelineConfig.renderPass = pipelineRessources->getRenderPass();
     pipelineConfig.pipelineLayout = pipelineLayout;
     lvePipeline = std::make_unique<LvePipeline>(
         lveDevice,

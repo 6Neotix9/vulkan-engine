@@ -15,18 +15,46 @@
 namespace lve {
 
 LvePipelineRessources::LvePipelineRessources(
-    LveDevice &lveDevice, PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo)
-    : lveDevice(lveDevice), renderPass(pipelineRessourcesCreateInfo.renderPass) {
+    LveDevice *lveDevice, PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo)
+    : lveDevice(lveDevice),
+      externalAttachments{pipelineRessourcesCreateInfo.externalAttachments} {
     createAttachementImage(pipelineRessourcesCreateInfo);
     createRenderPass(pipelineRessourcesCreateInfo);
     createFrameBuffer(pipelineRessourcesCreateInfo);
 }
+LvePipelineRessources::LvePipelineRessources(
+        ){}
+
+
+LvePipelineRessources& LvePipelineRessources::operator=(LvePipelineRessources&& other){
+    LveDevice* tempLvedevice = this->lveDevice;
+    std::vector<ExternalImageAttachement> tempExternalAttachments = this->externalAttachments;
+    std::vector<VkFramebuffer> tempFrameBuffer = this->frameBuffer;
+    std::vector<ImagesAttachment> tempImagesAttachments = this->imagesAttachments;
+    VkRenderPass tempRenderPass = this->renderPass;
+
+    
+    this->lveDevice = other.lveDevice;
+    this->externalAttachments = other.externalAttachments;
+    this->frameBuffer = other.frameBuffer;
+    this->imagesAttachments = other.imagesAttachments;
+    this->renderPass = other.renderPass;
+
+
+    other.lveDevice = tempLvedevice;
+    other.externalAttachments = tempExternalAttachments;
+    other.frameBuffer = tempFrameBuffer;
+    other.imagesAttachments = tempImagesAttachments;
+    other.renderPass = tempRenderPass;
+    return *this;
+}
 
 LvePipelineRessources::~LvePipelineRessources() {
     for (auto framebuffer : frameBuffer) {
-        vkDestroyFramebuffer(lveDevice.device(), framebuffer, nullptr);
+        vkDestroyFramebuffer(lveDevice->device(), framebuffer, nullptr);
     }
-    vkDestroyRenderPass(lveDevice.device(), oldRenderPass, nullptr);
+    if (renderPass != VK_NULL_HANDLE)
+        vkDestroyRenderPass(lveDevice->device(), renderPass, nullptr);
 }
 
 void LvePipelineRessources::createAttachementImage(
@@ -45,7 +73,7 @@ void LvePipelineRessources::createAttachementImage(
         if (pipelineRessourcesCreateInfo.hasDepthAttachement) {
             ImageCreateInfo imageCreateInfo{};
             imageCreateInfo.usageFlags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-            imageCreateInfo.format = lveDevice.findSupportedFormat(
+            imageCreateInfo.format = lveDevice->findSupportedFormat(
                 {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
                 VK_IMAGE_TILING_OPTIMAL,
                 VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
@@ -147,11 +175,11 @@ void LvePipelineRessources::createRenderPass(
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(lveDevice.device(), &renderPassInfo, nullptr, &oldRenderPass) !=
+    if (vkCreateRenderPass(lveDevice->device(), &renderPassInfo, nullptr, &renderPass) !=
         VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
-    *renderPass = oldRenderPass;
+
 }
 void LvePipelineRessources::createFrameBuffer(
     PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo) {
@@ -174,14 +202,14 @@ void LvePipelineRessources::createFrameBuffer(
 
         VkFramebufferCreateInfo framebufferInfo = {};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = *renderPass;
+        framebufferInfo.renderPass = renderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
         framebufferInfo.width = pipelineRessourcesCreateInfo.width;
         framebufferInfo.height = pipelineRessourcesCreateInfo.height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(lveDevice.device(), &framebufferInfo, nullptr, &frameBuffer[i]) !=
+        if (vkCreateFramebuffer(lveDevice->device(), &framebufferInfo, nullptr, &frameBuffer[i]) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }

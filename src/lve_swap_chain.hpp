@@ -18,9 +18,9 @@ class LveSwapChain {
  public:
   static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-  LveSwapChain(LveDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<VkRenderPass> renderPass);
+  LveSwapChain(LveDevice *deviceRef, VkExtent2D windowExtent, std::shared_ptr<LvePipelineRessources> &renderPass);
   LveSwapChain(
-      LveDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<LveSwapChain> previous, std::shared_ptr<VkRenderPass> renderPass);
+      LveDevice *deviceRef, VkExtent2D windowExtent, std::shared_ptr<LveSwapChain> previous, std::shared_ptr<LvePipelineRessources> &renderPass);
 
   ~LveSwapChain();
 
@@ -50,7 +50,7 @@ class LveSwapChain {
   }
 
  private:
-  void init(std::shared_ptr<VkRenderPass> renderPass);
+  void init();
   void createSwapChain();
   void createImageViews();
   void createSyncObjects();
@@ -70,7 +70,7 @@ class LveSwapChain {
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;
 
-  LveDevice &device;
+  LveDevice *device;
   VkExtent2D windowExtent;
 
   VkSwapchainKHR swapChain;

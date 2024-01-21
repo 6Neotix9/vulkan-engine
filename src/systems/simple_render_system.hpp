@@ -3,8 +3,7 @@
 #include <vulkan/vulkan_core.h>
 #include "lve_device.hpp"
 #include "lve_frame_info.hpp"
-#include "lve_pipeline.hpp"
-#include "systems/lve_I_system.hpp"
+#include "systems/lve_A_system.hpp"
 
 // std
 #include <memory>
@@ -12,7 +11,7 @@
 #include <mutex>
 
 namespace lve {
-class SimpleRenderSystem : public LveISystem {
+class SimpleRenderSystem : public LveASystem {
    public:
     SimpleRenderSystem(
         LveDevice &device, std::shared_ptr<LvePipelineRessources> pipelineRessources, VkDescriptorSetLayout globalSetLayout);
@@ -23,16 +22,10 @@ class SimpleRenderSystem : public LveISystem {
 
     void renderGameObjects(FrameInfo &frameInfo);
 
-    void reloadShaders() override;
+
 
    private:
-    void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-    void createPipeline();
-
-    std::mutex shaderReloadMutex = std::mutex();
-    LveDevice &lveDevice;
-    std::shared_ptr<LvePipelineRessources> pipelineRessources;
-    std::unique_ptr<LvePipeline> lvePipeline;
-    VkPipelineLayout pipelineLayout;
+    void createPipelineLayout(std::vector<VkDescriptorSetLayout> globalSetLayout) override;
+    void createPipeline() override;
 };
 }  // namespace lve

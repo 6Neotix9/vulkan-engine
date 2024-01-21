@@ -1,6 +1,7 @@
 #include "lve_renderer.hpp"
 #include <vulkan/vulkan_core.h>
 
+#include "lve_pipeline_ressources.hpp"
 #include "lve_sync.hpp"
 
 // std
@@ -10,9 +11,9 @@
 
 namespace lve {
 
-LveRenderer::LveRenderer(LveWindow& window, LveDevice& device)
+LveRenderer::LveRenderer(LveWindow& window, LveDevice* device)
     : lveWindow{window}, lveDevice{device} {
-    renderPass = std::make_shared<VkRenderPass>();
+    pipelineRessources = std::make_shared<LvePipelineRessources>();
     recreateSwapChain();
     createCommandBuffers();
 }
@@ -25,18 +26,19 @@ void LveRenderer::recreateSwapChain() {
         extent = lveWindow.getExtent();
         glfwWaitEvents();
     }
-    vkDeviceWaitIdle(lveDevice.device());
+    vkDeviceWaitIdle(lveDevice->device());
 
     if (lveSwapChain == nullptr) {
-        lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, renderPass);
+        lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, pipelineRessources);
     } else {
         std::shared_ptr<LveSwapChain> oldSwapChain = std::move(lveSwapChain);
-        lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, oldSwapChain, renderPass);
+        lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, oldSwapChain, pipelineRessources);
 
         if (!oldSwapChain->compareSwapFormats(*lveSwapChain.get())) {
             throw std::runtime_error("Swap chain image(or depth) format has changed!");
         }
     }
+    assert(pipelineRessources == lveSwapChain->getPipelineRessources());
 }
 
 void LveRenderer::createCommandBuffers() {
@@ -45,10 +47,10 @@ void LveRenderer::createCommandBuffers() {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = lveDevice.getCommandPool();
+    allocInfo.commandPool = lveDevice->getCommandPool();
     allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-    if (vkAllocateCommandBuffers(lveDevice.device(), &allocInfo, commandBuffers.data()) !=
+    if (vkAllocateCommandBuffers(lveDevice->device(), &allocInfo, commandBuffers.data()) !=
         VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
@@ -56,8 +58,8 @@ void LveRenderer::createCommandBuffers() {
 
 void LveRenderer::freeCommandBuffers() {
     vkFreeCommandBuffers(
-        lveDevice.device(),
-        lveDevice.getCommandPool(),
+        lveDevice->device(),
+        lveDevice->getCommandPool(),
         static_cast<uint32_t>(commandBuffers.size()),
         commandBuffers.data());
     commandBuffers.clear();
@@ -120,13 +122,13 @@ void LveRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = *renderPass;
+    renderPassInfo.renderPass = pipelineRessources->getRenderPass();
     renderPassInfo.framebuffer = lveSwapChain->getFrameBuffer(currentImageIndex);
 
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = lveSwapChain->getSwapChainExtent();
 
-    std::array<VkClearValue, 2> clearValues{};
+    std::array<VkClearValue, 3> clearValues{};
     clearValues[0].color = {0.01f, 0.01f, 0.01f, 1.0f};
     clearValues[1].color = {0.01f, 0.01f, 0.01f, 1.0f};
     clearValues[2].depthStencil = {1.0f, 0};

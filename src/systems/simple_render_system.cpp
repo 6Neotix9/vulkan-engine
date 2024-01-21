@@ -2,8 +2,9 @@
 #include <vulkan/vulkan_core.h>
 #include <iostream>
 #include <thread>
-#include "../lve_hot_reload.hpp"
+#include <vector>
 #include "lve_pipeline_ressources.hpp"
+#include "systems/lve_A_system.hpp"
 
 
 // libs
@@ -26,19 +27,17 @@ struct SimplePushConstantData {
 
 SimpleRenderSystem::SimpleRenderSystem(
     LveDevice& device, std::shared_ptr<LvePipelineRessources> pipelineRessources, VkDescriptorSetLayout globalSetLayout)
-    : lveDevice{device}, pipelineRessources{pipelineRessources} {
-    createPipelineLayout(globalSetLayout);
+    : LveASystem(device, "simple_shader", pipelineRessources, std::vector<VkDescriptorSetLayout>{globalSetLayout}) {
+    createPipelineLayout(std::vector<VkDescriptorSetLayout>{globalSetLayout});
     createPipeline();
-    LveHotReload::getInstance()->addShader("simple_shader", this);
 }
 
 SimpleRenderSystem::~SimpleRenderSystem() {
-    vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr);
 }
 
 
 
-void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+void SimpleRenderSystem::createPipelineLayout(std::vector<VkDescriptorSetLayout> globalSetLayout) {
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
@@ -73,12 +72,6 @@ void SimpleRenderSystem::createPipeline() {
         pipelineConfig);
 }
 
-void SimpleRenderSystem::reloadShaders() {
-    lveDevice.stopRendering();
-    this->createPipeline();
-    lveDevice.startRendering();
-
-}
 
 void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
     lvePipeline->bind(frameInfo.commandBuffer);

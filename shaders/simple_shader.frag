@@ -6,6 +6,7 @@ layout (location = 2) in vec3 fragNormalWorld;
 layout (location = 3) in vec2 fragUv;
 
 layout (location = 0) out vec4 outColor;
+layout (location = 1) out vec4 testColor;
 
 struct PointLight {
   vec4 position; // ignore w
@@ -57,6 +58,6 @@ void main() {
   vec3 imageColor = textureLod(image, fragUv, 0).rgb;
   
   outColor = vec4(diffuseLight * imageColor + specularLight * imageColor, 1.0);
-
+  testColor = vec4(surfaceNormal, 1.0);
 
 }

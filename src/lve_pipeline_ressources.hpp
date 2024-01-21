@@ -34,29 +34,34 @@ struct ImagesAttachment {
 class LvePipelineRessources {
    public:
     LvePipelineRessources(
-        LveDevice &lveDevice, PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo);
+        LveDevice *lveDevice, PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo);
+    LvePipelineRessources();
 
     ~LvePipelineRessources();
 
-    //getters
-    VkRenderPass getRenderPass() { return *renderPass; }
-    std::shared_ptr<VkRenderPass> getRenderPassPtr() {return renderPass;}
-    VkFramebuffer getFrameBuffer(int index) { return frameBuffer[index]; }
-    std::vector<std::shared_ptr<LveImage>> getImageColorAttachments(){return imagesAttachments[0].colorImage;}
+    LvePipelineRessources& operator=(LvePipelineRessources&&);
 
-    
+    // getters
+    VkRenderPass getRenderPass() { return renderPass; }
+    VkFramebuffer getFrameBuffer(int index) { return frameBuffer[index]; }
+    std::vector<std::shared_ptr<LveImage>> getImageColorAttachments() {
+        return imagesAttachments[0].colorImage;
+    }
+    std::vector<ExternalImageAttachement> getExternalImageAttachement() {
+        return externalAttachments;
+    }
+    VkFormat getDepthFormat() { return imagesAttachments[0].depthImage->getFormat(); }
 
    private:
     void createAttachementImage(PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo);
     void createRenderPass(PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo);
     void createFrameBuffer(PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo);
 
-    std::shared_ptr<VkRenderPass> renderPass;
-    VkRenderPass oldRenderPass;
+    VkRenderPass renderPass;
     std::vector<VkFramebuffer> frameBuffer;
     std::vector<ImagesAttachment> imagesAttachments;
-
-    LveDevice &lveDevice;
+    std::vector<ExternalImageAttachement> externalAttachments;
+    LveDevice *lveDevice;
 };
 
 }  // namespace lve

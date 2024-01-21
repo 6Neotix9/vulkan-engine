@@ -33,8 +33,8 @@ class FirstApp {
 
     LveWindow lveWindow{WIDTH, HEIGHT, "Vulkan Tutorial"};
     LveDevice lveDevice{lveWindow};
-    LveRenderer lveRenderer{lveWindow, lveDevice};
-
+    LveRenderer lveRenderer{lveWindow, &lveDevice};
+    
     // note: order of declarations matters
     std::unique_ptr<LveDescriptorPool> globalPool{};
     LveGameObject::Map gameObjects;

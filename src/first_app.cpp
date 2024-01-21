@@ -10,6 +10,7 @@
 #include "lve_image.hpp"
 #include "lve_swap_chain.hpp"
 #include "systems/point_light_system.hpp"
+#include "systems/ray_rendering_system.hpp"
 #include "systems/simple_render_system.hpp"
 
 
@@ -54,17 +55,18 @@ void FirstApp::run() {
     imageCreateInfo.filename = "textures/truc.jpg";
     imageCreateInfo.usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT;
     imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-    LveImage image{lveDevice, imageCreateInfo};
+    LveImage image{&lveDevice, imageCreateInfo};
 
 
-    // PipelineRessourcesCreateInfo test{};
-    // test.colorAttachments = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_R16G16B16A16_SNORM};
-    // test.hasDepthAttachement = true;
-    // test.numberOfImage = LveSwapChain::MAX_FRAMES_IN_FLIGHT;
-    // test.width = 1280;
-    // test.height = 720;
+    PipelineRessourcesCreateInfo test{};
+    test.colorAttachments = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_R16G16B16A16_SNORM};
+    test.hasDepthAttachement = true;
+    test.numberOfImage = LveSwapChain::MAX_FRAMES_IN_FLIGHT;
+    test.width = 1280;
+    test.height = 720;
 
     // LvePipelineRessources t {test, lveDevice};
+
 
     std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
     for (int i = 0; i < uboBuffers.size(); i++) {
@@ -103,7 +105,13 @@ void FirstApp::run() {
 
     PointLightSystem pointLightSystem{
         lveDevice,
-        lveRenderer.renderPass,
+        lveRenderer.getSwapchainPipeLineRessources(),
+        globalSetLayout->getDescriptorSetLayout()};
+
+
+    RayRenderingSystem rayRenderingSystem{
+        lveDevice,
+        lveRenderer.getSwapchainPipeLineRessources(),
         globalSetLayout->getDescriptorSetLayout()};
     LveCamera camera{};
 
@@ -133,6 +141,7 @@ void FirstApp::run() {
             FrameInfo frameInfo{
                 frameIndex,
                 frameTime,
+                lveRenderer.getSwapChainExtent(),
                 commandBuffer,
                 camera,
                 globalDescriptorSets[frameIndex],
@@ -153,6 +162,7 @@ void FirstApp::run() {
             // order here matters
             simpleRenderSystem.renderGameObjects(frameInfo);
             pointLightSystem.render(frameInfo);
+            rayRenderingSystem.render(frameInfo);
 
             lveRenderer.endSwapChainRenderPass(commandBuffer);
             lveRenderer.endFrame();

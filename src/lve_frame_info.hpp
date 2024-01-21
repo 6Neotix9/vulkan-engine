@@ -5,6 +5,7 @@
 
 // lib
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 namespace lve {
 
@@ -27,6 +28,7 @@ struct GlobalUbo {
 struct FrameInfo {
   int frameIndex;
   float frameTime;
+  VkExtent2D extent;
   VkCommandBuffer commandBuffer;
   LveCamera &camera;
   VkDescriptorSet globalDescriptorSet;

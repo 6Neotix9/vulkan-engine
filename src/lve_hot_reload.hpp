@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-#include "systems/lve_I_system.hpp"
+#include "systems/lve_A_system.hpp"
 
 #include <uv.h>
 #include <thread>
@@ -17,14 +17,14 @@ class LveHotReload {
 
     static LveHotReload* getInstance();
 
-    void addShader(std::string name, LveISystem *shader);
+    void addShader(std::string name, LveASystem *shader);
     void reloadShaders(std::string name);
     void on_file_change(uv_fs_event_t* handle, const char* filename, int events, int status);
    
    private:
     LveHotReload();
     inline static std::unique_ptr<LveHotReload> instance;
-    std::map<std::string, LveISystem*> shaderMap;
+    std::map<std::string, LveASystem*> shaderMap;
     std::thread uv_thread;
     uv_fs_event_t fs_event;
     uv_loop_t loop;

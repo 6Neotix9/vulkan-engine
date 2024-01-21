@@ -172,8 +172,9 @@ void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
     configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;  // Optional
     configInfo.multisampleInfo.alphaToOneEnable = VK_FALSE;       // Optional
     configInfo.colorBlendAttachment.resize(
-        configInfo.pipelineRessource->getImageColorAttachments().size());
-    for (int i = 0; i < configInfo.colorBlendAttachment.size(); i++) {
+        configInfo.pipelineRessource->getImageColorAttachments().size() + configInfo.pipelineRessource->getExternalImageAttachement().size());
+    
+    for (int i = 0; i < configInfo.pipelineRessource->getImageColorAttachments().size(); i++) {
         configInfo.colorBlendAttachment[i].colorWriteMask =
             VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
             VK_COLOR_COMPONENT_A_BIT;
@@ -185,6 +186,20 @@ void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
         configInfo.colorBlendAttachment[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
         configInfo.colorBlendAttachment[i].alphaBlendOp = VK_BLEND_OP_ADD;              // Optional
     }
+    for (int i = configInfo.pipelineRessource->getImageColorAttachments().size(); i < configInfo.colorBlendAttachment.size(); i++) {
+        configInfo.colorBlendAttachment[i].colorWriteMask =
+            VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+            VK_COLOR_COMPONENT_A_BIT;
+        configInfo.colorBlendAttachment[i].blendEnable = VK_FALSE;
+        configInfo.colorBlendAttachment[i].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
+        configInfo.colorBlendAttachment[i].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
+        configInfo.colorBlendAttachment[i].colorBlendOp = VK_BLEND_OP_ADD;              // Optional
+        configInfo.colorBlendAttachment[i].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
+        configInfo.colorBlendAttachment[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
+        configInfo.colorBlendAttachment[i].alphaBlendOp = VK_BLEND_OP_ADD;              // Optional
+    }
+    
+    
     configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;
     configInfo.colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional

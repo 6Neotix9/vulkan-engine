@@ -3,8 +3,8 @@
 
 #include "lve_device.hpp"
 #include "lve_frame_info.hpp"
-#include "lve_pipeline.hpp"
-#include "lve_I_system.hpp"
+#include "lve_A_system.hpp"
+#include "lve_pipeline_ressources.hpp"
 
 
 // std
@@ -12,10 +12,10 @@
 #include <vector>
 
 namespace lve {
-class PointLightSystem : public LveISystem{
+class PointLightSystem : public LveASystem{
  public:
   PointLightSystem(
-      LveDevice &device, std::shared_ptr<VkRenderPass> renderPass, VkDescriptorSetLayout globalSetLayout);
+      LveDevice &device, std::shared_ptr<LvePipelineRessources> renderPass, VkDescriptorSetLayout globalSetLayout);
   ~PointLightSystem();
 
   PointLightSystem(const PointLightSystem &) = delete;
@@ -24,15 +24,9 @@ class PointLightSystem : public LveISystem{
   void update(FrameInfo &frameInfo, GlobalUbo &ubo);
   void render(FrameInfo &frameInfo);
 
-  void reloadShaders() override;
 
  private:
-  void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-  void createPipeline(VkRenderPass renderPass);
-
-  LveDevice &lveDevice;
-  std::shared_ptr<VkRenderPass> renderPass;
-  std::unique_ptr<LvePipeline> lvePipeline;
-  VkPipelineLayout pipelineLayout;
+  void createPipelineLayout(std::vector<VkDescriptorSetLayout> globalSetLayout) override;
+  void createPipeline() override;
 };
 }  // namespace lve

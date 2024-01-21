@@ -17,7 +17,7 @@
 
 namespace lve {
 
-LveImage::LveImage(LveDevice& device, ImageCreateInfo& imageCreateInfo) : lveDevice{device} {
+LveImage::LveImage(LveDevice* device, ImageCreateInfo& imageCreateInfo) : lveDevice{device} {
     if (!imageCreateInfo.filename.empty()) {
         loadImageFromFile(imageCreateInfo);
     }
@@ -37,12 +37,12 @@ LveImage::LveImage(LveDevice& device, ImageCreateInfo& imageCreateInfo) : lveDev
 }
 
 LveImage::~LveImage() {
-    if (sampler != VK_NULL_HANDLE) vkDestroySampler(lveDevice.device(), sampler, nullptr);
+    if (sampler != VK_NULL_HANDLE) vkDestroySampler(lveDevice->device(), sampler, nullptr);
 
-    if (imageView != VK_NULL_HANDLE) vkDestroyImageView(lveDevice.device(), imageView, nullptr);
+    if (imageView != VK_NULL_HANDLE) vkDestroyImageView(lveDevice->device(), imageView, nullptr);
 
-    if (image != VK_NULL_HANDLE) vkDestroyImage(lveDevice.device(), image, nullptr);
-    vkFreeMemory(lveDevice.device(), imageMemory, nullptr);
+    if (image != VK_NULL_HANDLE) vkDestroyImage(lveDevice->device(), image, nullptr);
+    vkFreeMemory(lveDevice->device(), imageMemory, nullptr);
 }
 
 void LveImage::createImage(ImageCreateInfo& imageCreateInfo) {
@@ -70,8 +70,7 @@ void LveImage::createImage(ImageCreateInfo& imageCreateInfo) {
     
     imageInfo.extent = {(uint32_t)imageCreateInfo.width, (uint32_t)imageCreateInfo.height, 1};
 
-    lveDevice
-        .createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory);
+    lveDevice->createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory);
     actualImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 }
 
@@ -95,7 +94,7 @@ void LveImage::createImageView(ImageCreateInfo& imageCreateInfo) {
     imageViewInfo.subresourceRange.layerCount = 1;
     imageViewInfo.subresourceRange.levelCount = mipLevels;
     imageViewInfo.image = image;
-    vkCreateImageView(lveDevice.device(), &imageViewInfo, nullptr, &imageView);
+    vkCreateImageView(lveDevice->device(), &imageViewInfo, nullptr, &imageView);
 }
 
 void LveImage::createSampler(ImageCreateInfo& imageCreateInfo) {
@@ -114,7 +113,7 @@ void LveImage::createSampler(ImageCreateInfo& imageCreateInfo) {
     samplerInfo.maxAnisotropy = 4.0f;
     samplerInfo.anisotropyEnable = VK_TRUE;                      // VK_FALSE
     samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;  // VK_BORDER_COLOR_INT_OPAQUE_BLACK
-    vkCreateSampler(lveDevice.device(), &samplerInfo, nullptr, &sampler);
+    vkCreateSampler(lveDevice->device(), &samplerInfo, nullptr, &sampler);
 }
 
 void LveImage::loadImageFromFile(ImageCreateInfo& imageCreateInfo) {
@@ -131,7 +130,7 @@ void LveImage::loadImageFromFile(ImageCreateInfo& imageCreateInfo) {
 void LveImage::loadImageToGPU(ImageCreateInfo& imageCreateInfo) {
     VkDeviceSize imageSize = width * height * getPixelSizeFromFormat(imageCreateInfo.format);
     LveBuffer stagingBuffer{
-        lveDevice,
+        *lveDevice,
         getPixelSizeFromFormat(imageCreateInfo.format),
         static_cast<u_int32_t>(width * height),
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -142,7 +141,7 @@ void LveImage::loadImageToGPU(ImageCreateInfo& imageCreateInfo) {
 
     transitionImageLayout(actualImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, nullptr);
 
-    lveDevice.copyBufferToImage(
+    lveDevice->copyBufferToImage(
         stagingBuffer.getBuffer(),
         image,
         static_cast<uint32_t>(width),
@@ -155,7 +154,7 @@ void LveImage::loadImageToGPU(ImageCreateInfo& imageCreateInfo) {
 }
 
 void LveImage::generateMipmaps() {
-    VkCommandBuffer commandBuffer = lveDevice.beginSingleTimeCommands();
+    VkCommandBuffer commandBuffer = lveDevice->beginSingleTimeCommands();
 
     transitionImageLayout(
         actualImageLayout,
@@ -221,7 +220,7 @@ void LveImage::generateMipmaps() {
         VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         commandBuffer);
-    lveDevice.endSingleTimeCommands(commandBuffer);
+    lveDevice->endSingleTimeCommands(commandBuffer);
     
 }
 
@@ -248,7 +247,7 @@ void LveImage::transitionImageLayout(
     VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
 
     if (externalCommandBuffer == nullptr) {
-        VkCommandBuffer commandBuffer = lveDevice.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = lveDevice->beginSingleTimeCommands();
         vkCmdPipelineBarrier(
             commandBuffer,
             sourceStage,
@@ -260,7 +259,7 @@ void LveImage::transitionImageLayout(
             nullptr,
             1,
             &barrier);
-        lveDevice.endSingleTimeCommands(commandBuffer);
+        lveDevice->endSingleTimeCommands(commandBuffer);
     } else {
         vkCmdPipelineBarrier(
             externalCommandBuffer,
@@ -304,7 +303,7 @@ void LveImage::transitionImageLayout(
     VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
 
     if (externalCommandBuffer == nullptr) {
-        VkCommandBuffer commandBuffer = lveDevice.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = lveDevice->beginSingleTimeCommands();
         vkCmdPipelineBarrier(
             commandBuffer,
             sourceStage,
@@ -316,7 +315,7 @@ void LveImage::transitionImageLayout(
             nullptr,
             1,
             &barrier);
-        lveDevice.endSingleTimeCommands(commandBuffer);
+        lveDevice->endSingleTimeCommands(commandBuffer);
     } else {
         vkCmdPipelineBarrier(
             externalCommandBuffer,
