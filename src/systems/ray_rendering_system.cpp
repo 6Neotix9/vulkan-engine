@@ -59,6 +59,7 @@ void RayRenderingSystem::createPipeline() {
     PipelineConfigInfo pipelineConfig{};
     pipelineConfig.pipelineRessource = pipelineRessources;
     LvePipeline::defaultPipelineConfigInfo(pipelineConfig);
+    LvePipeline::enableAlphaBlending(pipelineConfig);
     pipelineConfig.attributeDescriptions.clear();
     pipelineConfig.bindingDescriptions.clear();
     pipelineConfig.renderPass = pipelineRessources->getRenderPass();

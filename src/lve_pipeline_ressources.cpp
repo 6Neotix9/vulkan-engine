@@ -23,7 +23,9 @@ LvePipelineRessources::LvePipelineRessources(
     createFrameBuffer(pipelineRessourcesCreateInfo);
 }
 LvePipelineRessources::LvePipelineRessources(
-        ){}
+        ){
+            renderPass = VK_NULL_HANDLE;
+        }
 
 
 LvePipelineRessources& LvePipelineRessources::operator=(LvePipelineRessources&& other){

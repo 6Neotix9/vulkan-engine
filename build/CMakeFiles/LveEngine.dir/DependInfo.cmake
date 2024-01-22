@@ -26,16 +26,14 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/neo/Documents/dev/vulkan-engine/src/lve_sync.cpp" "CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/lve_window.cpp" "CMakeFiles/LveEngine.dir/src/lve_window.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/lve_window.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/main.cpp" "CMakeFiles/LveEngine.dir/src/main.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/main.cpp.o.d"
+  "/home/neo/Documents/dev/vulkan-engine/src/systems/lve_A_system.cpp" "CMakeFiles/LveEngine.dir/src/systems/lve_A_system.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/systems/lve_A_system.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/systems/point_light_system.cpp" "CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o.d"
+  "/home/neo/Documents/dev/vulkan-engine/src/systems/ray_rendering_system.cpp" "CMakeFiles/LveEngine.dir/src/systems/ray_rendering_system.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/systems/ray_rendering_system.cpp.o.d"
   "/home/neo/Documents/dev/vulkan-engine/src/systems/simple_render_system.cpp" "CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o" "gcc" "CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
 set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
-  )
-
-# Targets to which this target links which contain Fortran sources.
-set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.
