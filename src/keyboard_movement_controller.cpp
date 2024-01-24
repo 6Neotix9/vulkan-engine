@@ -27,6 +27,8 @@ void KeyboardMovementController::moveInPlaneXZ(
     const glm::vec3 rightDir{forwardDir.z, 0.f, -forwardDir.x};
     const glm::vec3 upDir{0.f, -1.f, 0.f};
 
+    if(glfwGetKey(window, keys.fast) == GLFW_PRESS) moveSpeed = moveSpeed *10;
+
     glm::vec3 moveDir{0.f};
     if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS) moveDir += forwardDir;
     if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS) moveDir -= forwardDir;
@@ -38,6 +40,7 @@ void KeyboardMovementController::moveInPlaneXZ(
     if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
         gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
     }
+    moveSpeed = 3;
 }
 
 }  // namespace lve

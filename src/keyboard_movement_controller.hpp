@@ -16,8 +16,8 @@ class KeyboardMovementController {
         int lookRight = GLFW_KEY_RIGHT;
         int lookUp = GLFW_KEY_UP;
         int lookDown = GLFW_KEY_DOWN;
-
-        int reloadShaders = GLFW_KEY_R;
+        int reloadShaders = GLFW_KEY_S;
+        int fast = GLFW_KEY_LEFT_SHIFT;
     };
 
     void moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);

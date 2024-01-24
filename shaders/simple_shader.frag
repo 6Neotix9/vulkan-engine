@@ -58,6 +58,6 @@ void main() {
   vec3 imageColor = textureLod(image, fragUv, 0).rgb;
   
   outColor = vec4(diffuseLight * imageColor + specularLight * imageColor, 1.0);
-  testColor = vec4(surfaceNormal, 1.0);
+ 
 
 }
