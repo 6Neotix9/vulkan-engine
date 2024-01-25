@@ -31,11 +31,12 @@ LveHotReload* LveHotReload::getInstance() {
 
 LveHotReload::~LveHotReload() {
     uv_stop(&loop);
-    uv_thread.join();  // Attendre la fin du thread
+   
 
     // Libérer les ressources
     uv_fs_event_stop(&fs_event);
     uv_loop_close(&loop);
+     uv_thread.join();  // Attendre la fin du thread
 }
 
 void LveHotReload::addShader(std::string name, LveASystem* shader) {

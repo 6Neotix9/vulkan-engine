@@ -9,6 +9,8 @@ const uint Plan = 0x00000006u;
 
 const float PI = 3.14159265359;
 
+const uint ANTI_ALIASING_FACTOR = 256;
+
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outColor2;
@@ -35,7 +37,6 @@ layout(set = 1, binding = 0) uniform sampler2D randomImage;
 layout(push_constant) uniform Push { vec2 resolution; }
 push;
 
-
 struct Object {
     uint type;
     uint objectL;
@@ -58,10 +59,15 @@ struct Point {
     float dist;
 };
 
+float random(vec2 seed, inout int iteration) {
+    float value = sin(dot(seed, vec2(12.9898, 78.233)) * 43758.5453 + float(iteration));
+    iteration++;
+    return fract(value);
+}
 
 Ray createRay(in vec2 px) {
     // convert pixel to NDS
-    vec2 pxNDS = (px / push.resolution) * 2. - 1.;
+    vec2 pxNDS = (px / (push.resolution)) * 2. - 1.;
 
     // choose an arbitrary point in the viewing volume
     // z = -1 equals a point on the near plane, i.e. the screen
@@ -126,7 +132,6 @@ Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out
     Point finalP;
     Object obj;
     float dist = 1.0 / 0.0;
-    
 
     for (int i = 0; i < numberOfobjects; i++) {
         obj = objects[i];
@@ -147,14 +152,15 @@ Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out
     return finalP;
 }
 
-bool checkIfShadow(in vec3 sunDir, in Point hitPoint, in Object[100] objects, in uint numberOfobjects) {
+bool checkIfShadow(
+    in vec3 sunDir, in Point hitPoint, in Object[100] objects, in uint numberOfobjects) {
     float d;
     Ray r = Ray(hitPoint.pos, sunDir);
-    Point p = intersect(r,objects, numberOfobjects, d);
+    Point p = intersect(r, objects, numberOfobjects, d);
     if (d < 0 || d == 1.0 / 0.0)
         return false;
-    else 
-    return true;
+    else
+        return true;
 }
 
 void main() {
@@ -163,33 +169,37 @@ void main() {
     Object sphere = Object(Sphere, 0, 0, vec3(0, -2, 0), vec3(0.1, 0.2, 0.8), vec3(0, 0, 0), 2);
     Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(1, 0.2, 0.8), vec3(0, 0, 0), 13);
     Object objects[100];
-    objects[0]=plan;
-    objects[1]=sphere;
-    objects[2]=spher2;
+    objects[0] = plan;
+    objects[1] = sphere;
+    objects[2] = spher2;
     uint nbOfObjects = 3;
 
     // create variable
+    int randomIteration = 0;
     vec3 ro;
     vec3 rd;
     float dist;
     vec3 color = vec3(1, 1, 1);
     vec2 coord = gl_FragCoord.xy;
+    vec2 randomSeed = texture(randomImage, coord / vec2(3840, 2160)).rg;
     vec3 sunDir = normalize(vec3(1, -1, 1));
+    vec3 ImageColor = {0,0,0};
+    for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
+        Ray ray = createRay(vec2(coord.x + random(randomSeed, randomIteration), coord.y + random(randomSeed, randomIteration)));
 
-    Ray ray = createRay(coord);
+        // intersect
 
-    // intersect
-
-    Point finalP = intersect(ray, objects, nbOfObjects, dist);
-    if (!(dist == 1.0 / 0.0 || dist < 0)) {
-        color = finalP.color * (max(0, dot(normalize(finalP.normal), normalize(sunDir))));
-        finalP.pos = finalP.pos + 0.001*finalP.normal;
-        if (checkIfShadow(sunDir,finalP, objects, nbOfObjects)){
-            color = color *0.;
+        Point finalP = intersect(ray, objects, nbOfObjects, dist);
+        if (!(dist == 1.0 / 0.0 || dist < 0)) {
+            color = finalP.color * (max(0, dot(normalize(finalP.normal), normalize(sunDir))));
+            finalP.pos = finalP.pos + 0.001 * finalP.normal;
+            if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
+                color = color * 0.;
+            }
+            ImageColor += color;
         }
-        outColor = vec4(vec3(finalP.normal), 1);
-        outColor = vec4(vec3(vec2(textureLod(randomImage, coord, 0).rg), 1), 1);
-    } else {
-        discard;
     }
+    vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR ;
+    outColor = vec4(vec3(finalColor), 1);
+    
 }

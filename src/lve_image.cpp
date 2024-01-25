@@ -28,10 +28,10 @@ LveImage::LveImage(LveDevice* device, ImageCreateInfo& imageCreateInfo) : lveDev
     if (imageCreateInfo.pixels != 0) {
         loadImageToGPU(imageCreateInfo);
     }
-    if (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_SAMPLED_BIT){
+    if (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_SAMPLED_BIT) {
         generateMipmaps();
     }
-    
+
     createImageView(imageCreateInfo);
     createSampler(imageCreateInfo);
 }
@@ -50,10 +50,12 @@ void LveImage::createImage(ImageCreateInfo& imageCreateInfo) {
         mipLevels = static_cast<uint32_t>(std::floor(
                         std::log2(std::max(imageCreateInfo.width, imageCreateInfo.width)))) +
                     1;
-        imageCreateInfo.usageFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        imageCreateInfo.usageFlags |=
+            VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
     if (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_STORAGE_BIT) {
-        imageCreateInfo.usageFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        imageCreateInfo.usageFlags |=
+            VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
 
     VkImageCreateInfo imageInfo{};
@@ -67,10 +69,11 @@ void LveImage::createImage(ImageCreateInfo& imageCreateInfo) {
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageInfo.usage = imageCreateInfo.usageFlags;
-    
+
     imageInfo.extent = {(uint32_t)imageCreateInfo.width, (uint32_t)imageCreateInfo.height, 1};
 
-    lveDevice->createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory);
+    lveDevice
+        ->createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory);
     actualImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 }
 
@@ -149,8 +152,7 @@ void LveImage::loadImageToGPU(ImageCreateInfo& imageCreateInfo) {
         1);
 
     // transitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, imageLayout, nullptr);
-
-    stbi_image_free(imageCreateInfo.pixels);
+    if (!imageCreateInfo.filename.empty()) stbi_image_free(imageCreateInfo.pixels);
 }
 
 void LveImage::generateMipmaps() {
@@ -221,7 +223,6 @@ void LveImage::generateMipmaps() {
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         commandBuffer);
     lveDevice->endSingleTimeCommands(commandBuffer);
-    
 }
 
 void LveImage::transitionImageLayout(

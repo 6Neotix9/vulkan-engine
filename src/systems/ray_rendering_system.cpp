@@ -101,12 +101,14 @@ void RayRenderingSystem::createDescriptorSet() {
 }
 
 void RayRenderingSystem::createRandomImage() {
+    ImageCreateInfo imageCreateInfo{};
     srand(static_cast<unsigned>(time(0)));
     std::vector<float> randomValues;
+    randomValues.resize(3840*2160*2);
     for (int i = 0; i < randomValues.size(); i++) {
-        randomValues.push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        randomValues[i] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     }
-    ImageCreateInfo imageCreateInfo{};
+    
     imageCreateInfo.pixels = randomValues.data();
     imageCreateInfo.usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT;
     imageCreateInfo.format = VK_FORMAT_R32G32_SFLOAT;
