@@ -7,6 +7,7 @@ const uint SUB = 0x00000004u;
 const uint Sphere = 0x00000005u;
 const uint Plan = 0x00000006u;
 
+const float PI = 3.14159265359;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
@@ -29,6 +30,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
 ubo;
 
 layout(set = 0, binding = 1) uniform sampler2D image;
+layout(set = 1, binding = 0) uniform sampler2D randomImage;
 
 layout(push_constant) uniform Push { vec2 resolution; }
 push;
@@ -185,7 +187,8 @@ void main() {
         if (checkIfShadow(sunDir,finalP, objects, nbOfObjects)){
             color = color *0.;
         }
-        outColor = vec4(vec3(color), 1);
+        outColor = vec4(vec3(finalP.normal), 1);
+        outColor = vec4(vec3(vec2(textureLod(randomImage, coord, 0).rg), 1), 1);
     } else {
         discard;
     }

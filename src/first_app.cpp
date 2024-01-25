@@ -161,8 +161,8 @@ void FirstApp::run() {
             lveRenderer.beginSwapChainRenderPass(commandBuffer);
 
             // order here matters
-            // simpleRenderSystem.renderGameObjects(frameInfo);
-            // pointLightSystem.render(frameInfo);
+            simpleRenderSystem.renderGameObjects(frameInfo);
+            pointLightSystem.render(frameInfo);
             rayRenderingSystem.render(frameInfo);
 
             lveRenderer.endSwapChainRenderPass(commandBuffer);
