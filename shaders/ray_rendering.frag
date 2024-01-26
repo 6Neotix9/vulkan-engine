@@ -9,7 +9,8 @@ const uint Plan = 0x00000006u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 256;
+const uint ANTI_ALIASING_FACTOR = 1;
+const uint LIGHT_PRECISION = 1;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
@@ -165,9 +166,9 @@ bool checkIfShadow(
 
 void main() {
     // Create objects
-    Object plan = Object(Plan, 0, 0, vec3(0, 4, 0), vec3(1, 1, 1), vec3(0, -1, 0), 0);
-    Object sphere = Object(Sphere, 0, 0, vec3(0, -2, 0), vec3(0.1, 0.2, 0.8), vec3(0, 0, 0), 2);
-    Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(1, 0.2, 0.8), vec3(0, 0, 0), 13);
+    Object plan = Object(Plan, 0, 0, vec3(0, 1, 0), vec3(1, 1, 1), vec3(0, -1, 0), 0);
+    Object sphere = Object(Sphere, 0, 0, vec3(0, -1, 0), vec3(0.1, 0.2, 0.8), vec3(0, 0, 0), 2);
+    Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(0.2, 0.2, 0.8), vec3(0, 0, 0), 13);
     Object objects[100];
     objects[0] = plan;
     objects[1] = sphere;
@@ -183,9 +184,11 @@ void main() {
     vec2 coord = gl_FragCoord.xy;
     vec2 randomSeed = texture(randomImage, coord / vec2(3840, 2160)).rg;
     vec3 sunDir = normalize(vec3(1, -1, 1));
-    vec3 ImageColor = {0,0,0};
+    vec3 ImageColor = {0, 0, 0};
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
-        Ray ray = createRay(vec2(coord.x + random(randomSeed, randomIteration), coord.y + random(randomSeed, randomIteration)));
+        Ray ray = createRay(vec2(
+            coord.x + random(randomSeed, randomIteration) - 0.5,
+            coord.y + random(randomSeed, randomIteration) - 0.5));
 
         // intersect
 
@@ -196,10 +199,29 @@ void main() {
             if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
                 color = color * 0.;
             }
+            float light = 1;
+            for (int j = 0; j < LIGHT_PRECISION; j++) {
+                float r1 = random(randomSeed, randomIteration);
+                float r2 = random(randomSeed, randomIteration);
+                float cos_theta = 1 - 2 * r2;
+                float sin_theta = 2 * sqrt(r2 * (1 - r2));
+                float phi = r1 * float(2 * PI);
+
+                vec3 domeLight = vec3(cos(phi) * sin_theta, sin(phi) * sin_theta, cos_theta);
+                // domeLight = vec3(domeLight.x, -domeLight.y, domeLight.z);
+                // if (dot(domeLight, finalP.normal) > 0){
+                if (!checkIfShadow(domeLight, finalP, objects, nbOfObjects)) {
+                    light += 1;
+                }
+                // }
+            }
+            color *= light / LIGHT_PRECISION;
             ImageColor += color;
         }
     }
-    vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR ;
+    vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
     outColor = vec4(vec3(finalColor), 1);
-    
+    int n = int(push.resolution.x*gl_FragCoord.x + gl_FragCoord.y);
+    int n2 = int(push.resolution.x*gl_FragCoord.x + gl_FragCoord.y);
+    outColor = vec4(vec2(random(vec2(0, 0), n ), random(vec2(0, 0), n2)), 0, 1);
 }
