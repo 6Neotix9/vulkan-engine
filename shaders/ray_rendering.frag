@@ -9,13 +9,12 @@ const uint Plan = 0x00000006u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 1;
-const uint LIGHT_PRECISION = 1;
+const uint ANTI_ALIASING_FACTOR = 16;
+const uint DOM_LIGHT = 8;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outColor2;
-layout(location = 2) out vec4 outColor3;
 
 struct PointLight {
     vec4 position;  // ignore w
@@ -29,6 +28,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     vec4 ambientLightColor;  // w is intensity
     PointLight pointLights[10];
     int numLights;
+    float frameTime;
 }
 ubo;
 
@@ -60,10 +60,21 @@ struct Point {
     float dist;
 };
 
-float random(vec2 seed, inout int iteration) {
-    float value = sin(dot(seed, vec2(12.9898, 78.233)) * 43758.5453 + float(iteration));
-    iteration++;
-    return fract(value);
+struct RandomSeed {
+    vec2 v2;
+    float time;
+    int iteration;
+};
+const float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio
+
+float gold_noise(in vec2 xy, in float seed) {
+    return fract(tan(distance(xy * PHI, xy) * seed) * xy.x);
+}
+
+vec2 random(inout RandomSeed seed) {
+    seed.v2 = texture(randomImage, seed.v2 + (float(seed.iteration) / 100)).rg;
+    seed.iteration++;
+    return seed.v2;
 }
 
 Ray createRay(in vec2 px) {
@@ -125,7 +136,7 @@ Point intersect_plan(in Object plan, in Ray ray) {
     } else {
         color = vec3(0., 0., 0.);
     }
-    return Point(hitCoord, color, plan.normal, d);
+    return Point(hitCoord, plan.color, plan.normal, d);
 }
 
 Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
@@ -168,7 +179,7 @@ void main() {
     // Create objects
     Object plan = Object(Plan, 0, 0, vec3(0, 1, 0), vec3(1, 1, 1), vec3(0, -1, 0), 0);
     Object sphere = Object(Sphere, 0, 0, vec3(0, -1, 0), vec3(0.1, 0.2, 0.8), vec3(0, 0, 0), 2);
-    Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(0.2, 0.2, 0.8), vec3(0, 0, 0), 13);
+    Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(1, 0.2, 0.8), vec3(0, 0, 0), 13);
     Object objects[100];
     objects[0] = plan;
     objects[1] = sphere;
@@ -176,19 +187,18 @@ void main() {
     uint nbOfObjects = 3;
 
     // create variable
-    int randomIteration = 0;
+
     vec3 ro;
     vec3 rd;
     float dist;
-    vec3 color = vec3(1, 1, 1);
+    vec3 color = vec3(0, 0, 0);
     vec2 coord = gl_FragCoord.xy;
-    vec2 randomSeed = texture(randomImage, coord / vec2(3840, 2160)).rg;
+    RandomSeed rseed =
+        RandomSeed(coord / vec2(3840, 2160) + fract(ubo.frameTime), fract(ubo.frameTime), 0);
     vec3 sunDir = normalize(vec3(1, -1, 1));
     vec3 ImageColor = {0, 0, 0};
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
-        Ray ray = createRay(vec2(
-            coord.x + random(randomSeed, randomIteration) - 0.5,
-            coord.y + random(randomSeed, randomIteration) - 0.5));
+        Ray ray = createRay(coord + random(rseed) - vec2(0.5, 0.5));
 
         // intersect
 
@@ -199,29 +209,31 @@ void main() {
             if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
                 color = color * 0.;
             }
-            float light = 1;
-            for (int j = 0; j < LIGHT_PRECISION; j++) {
-                float r1 = random(randomSeed, randomIteration);
-                float r2 = random(randomSeed, randomIteration);
-                float cos_theta = 1 - 2 * r2;
-                float sin_theta = 2 * sqrt(r2 * (1 - r2));
-                float phi = r1 * float(2 * PI);
-
-                vec3 domeLight = vec3(cos(phi) * sin_theta, sin(phi) * sin_theta, cos_theta);
-                // domeLight = vec3(domeLight.x, -domeLight.y, domeLight.z);
-                // if (dot(domeLight, finalP.normal) > 0){
-                if (!checkIfShadow(domeLight, finalP, objects, nbOfObjects)) {
-                    light += 1;
+            if (DOM_LIGHT > 0) {
+                vec3 lighDomeColor = vec3(0, 0, 0);
+                for (int j = 0; j < DOM_LIGHT; j++) {
+                    vec2 randomNum = random(rseed);
+                    float r1 = randomNum.x;
+                    float r2 = randomNum.y;
+                    float theta = r1 * PI;
+                    float phi = r2 * 2 * PI;
+                   
+                    vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
+                    if (dot(d, finalP.normal) > 0) {
+                        vec3 temp = finalP.color * (max(0, dot(normalize(finalP.normal), d)));
+                        if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
+                            temp = color * 0.;
+                        }
+                        lighDomeColor += temp;
+                    }
                 }
-                // }
+                color = color*0.5  + (lighDomeColor / float(DOM_LIGHT)) * 0.5;
             }
-            color *= light / LIGHT_PRECISION;
+
             ImageColor += color;
         }
     }
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
-    outColor = vec4(vec3(finalColor), 1);
-    int n = int(push.resolution.x*gl_FragCoord.x + gl_FragCoord.y);
-    int n2 = int(push.resolution.x*gl_FragCoord.x + gl_FragCoord.y);
-    outColor = vec4(vec2(random(vec2(0, 0), n ), random(vec2(0, 0), n2)), 0, 1);
+    outColor2 = vec4(finalColor, 1);
+    outColor = vec4(finalColor, 1);
 }

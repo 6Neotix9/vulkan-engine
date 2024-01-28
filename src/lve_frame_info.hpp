@@ -23,6 +23,7 @@ struct GlobalUbo {
   glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f};  // w is intensity
   PointLight pointLights[MAX_LIGHTS];
   int numLights;
+  float frameTime;
 };
 
 struct FrameInfo {

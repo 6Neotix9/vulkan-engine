@@ -25,7 +25,7 @@ class RayRenderingSystem : public LveASystem {
 
     void update(FrameInfo &frameInfo, GlobalUbo &ubo);
     void render(FrameInfo &frameInfo);
-
+    std::vector<std::unique_ptr<LveImage>> previousImages;
    private:
     void createRandomImage();
     void createDescriptorSet();
@@ -35,6 +35,10 @@ class RayRenderingSystem : public LveASystem {
     std::unique_ptr<LveDescriptorPool> randomImageDescriptorPool;
     std::unique_ptr<LveDescriptorSetLayout> randomImageDescriptorLayout;
     VkDescriptorSet randomImageDescriptorSet;
+    std::unique_ptr<LveDescriptorSetLayout> previousImageDescriptorLayout;
+    std::vector<VkDescriptorSet> previousImageDescriptorSets;
+    
+
     std::unique_ptr<LveImage> randomImage;
 };
 }  // namespace lve

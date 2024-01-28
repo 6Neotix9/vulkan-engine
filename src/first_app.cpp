@@ -121,6 +121,7 @@ void FirstApp::run() {
     KeyboardMovementController cameraController{};
 
     auto currentTime = std::chrono::high_resolution_clock::now();
+    float totalFrameTime = 0.f;
     while (!lveWindow.shouldClose()) {
         glfwPollEvents();
 
@@ -129,6 +130,7 @@ void FirstApp::run() {
             std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime)
                 .count();
         currentTime = newTime;
+        totalFrameTime += frameTime;
 
         cameraController.moveInPlaneXZ(lveWindow.getGLFWwindow(), frameTime, viewerObject);
 
@@ -153,7 +155,9 @@ void FirstApp::run() {
             ubo.projection = camera.getProjection();
             ubo.view = camera.getView();
             ubo.inverseView = camera.getInverseView();
+            ubo.frameTime = totalFrameTime;
             pointLightSystem.update(frameInfo, ubo);
+
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
 

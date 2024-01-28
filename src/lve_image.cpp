@@ -28,10 +28,6 @@ LveImage::LveImage(LveDevice* device, ImageCreateInfo& imageCreateInfo) : lveDev
     if (imageCreateInfo.pixels != 0) {
         loadImageToGPU(imageCreateInfo);
     }
-    if (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_SAMPLED_BIT) {
-        generateMipmaps();
-    }
-
     createImageView(imageCreateInfo);
     createSampler(imageCreateInfo);
 }
