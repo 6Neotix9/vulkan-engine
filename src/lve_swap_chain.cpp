@@ -12,6 +12,8 @@
 #include <set>
 #include <stdexcept>
 
+#include "lve_device.hpp"
+#include "lve_image.hpp"
 #include "lve_pipeline_ressources.hpp"
 
 namespace lve {
@@ -41,10 +43,11 @@ void LveSwapChain::init() {
     createSwapChain();
     createImageViews();
     createSyncObjects();
+    createLveImages();
 
     ExternalImageAttachement externalImageAttachement{};
-    externalImageAttachement.imageformat = swapChainImageFormat;
-    externalImageAttachement.imageView = swapChainImageViews;
+    externalImageAttachement.images = LveSwapChainImages;
+    
 
     PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo{};
     pipelineRessourcesCreateInfo.hasDepthAttachement = true;
@@ -253,6 +256,13 @@ void LveSwapChain::createSyncObjects() {
                 VK_SUCCESS) {
             throw std::runtime_error("failed to create synchronization objects for a frame!");
         }
+    }
+}
+
+void LveSwapChain::createLveImages(){
+    LveSwapChainImages.resize(swapChainImages.size());
+    for (int i = 0; i < LveSwapChainImages.size(); i++ ){
+        LveSwapChainImages[i] = std::make_shared<LveImage>(device, swapChainImages[i], swapChainImageViews[i], swapChainImageFormat, swapChainExtent);
     }
 }
 

@@ -170,7 +170,7 @@ void RayRenderingSystem::render(FrameInfo& frameInfo) {
         VK_PIPELINE_BIND_POINT_GRAPHICS,
         pipelineLayout,
         0,
-        2,
+        descriptorSet.size(),
         descriptorSet.data(),
         0,
         nullptr);

@@ -10,7 +10,7 @@ const uint Plan = 0x00000006u;
 const float PI = 3.14159265359;
 
 const uint ANTI_ALIASING_FACTOR = 16;
-const uint DOM_LIGHT = 8;
+const uint DOM_LIGHT = 16;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
@@ -34,6 +34,7 @@ ubo;
 
 layout(set = 0, binding = 1) uniform sampler2D image;
 layout(set = 1, binding = 0) uniform sampler2D randomImage;
+layout(set = 2, binding = 0) uniform sampler2D previousImage;
 
 layout(push_constant) uniform Push { vec2 resolution; }
 push;
@@ -65,16 +66,10 @@ struct RandomSeed {
     float time;
     int iteration;
 };
-const float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio
-
-float gold_noise(in vec2 xy, in float seed) {
-    return fract(tan(distance(xy * PHI, xy) * seed) * xy.x);
-}
-
-vec2 random(inout RandomSeed seed) {
-    seed.v2 = texture(randomImage, seed.v2 + (float(seed.iteration) / 100)).rg;
-    seed.iteration++;
-    return seed.v2;
+vec2 random(inout vec2 seed) {
+    vec2 truc = fract(4*texture(randomImage, seed).rg);
+    seed = seed+0.01;
+    return truc;
 }
 
 Ray createRay(in vec2 px) {
@@ -193,8 +188,7 @@ void main() {
     float dist;
     vec3 color = vec3(0, 0, 0);
     vec2 coord = gl_FragCoord.xy;
-    RandomSeed rseed =
-        RandomSeed(coord / vec2(3840, 2160) + fract(ubo.frameTime), fract(ubo.frameTime), 0);
+    vec2 rseed = (coord / vec2(3840, 2160)) + fract(ubo.frameTime) ;
     vec3 sunDir = normalize(vec3(1, -1, 1));
     vec3 ImageColor = {0, 0, 0};
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
@@ -234,6 +228,9 @@ void main() {
         }
     }
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
+    
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
+
+
 }

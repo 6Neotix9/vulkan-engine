@@ -12,8 +12,7 @@
 namespace lve {
 
 struct ExternalImageAttachement {
-    std::vector<VkImageView> imageView;
-    VkFormat imageformat;
+    std::vector<std::shared_ptr<LveImage>> images;
 };
 
 struct PipelineRessourcesCreateInfo {
@@ -47,6 +46,12 @@ class LvePipelineRessources {
     std::vector<std::shared_ptr<LveImage>> getImageColorAttachments() {
         return imagesAttachments[0].colorImage;
     }
+
+    std::vector<std::shared_ptr<LveImage>> getImageColorAttachments(uint i){
+        return imagesAttachments[i].colorImage;
+    }
+
+
     std::vector<ExternalImageAttachement> getExternalImageAttachement() {
         return externalAttachments;
     }

@@ -24,21 +24,45 @@ LveImage::LveImage(LveDevice* device, ImageCreateInfo& imageCreateInfo) : lveDev
     this->imageFormat = imageCreateInfo.format;
     this->width = imageCreateInfo.width;
     this->height = imageCreateInfo.height;
+    this->imageLayout = imageCreateInfo.imageLayout;
     createImage(imageCreateInfo);
     if (imageCreateInfo.pixels != 0) {
         loadImageToGPU(imageCreateInfo);
     }
     createImageView(imageCreateInfo);
     createSampler(imageCreateInfo);
+    if (imageCreateInfo.imageLayout == VK_IMAGE_LAYOUT_UNDEFINED &&
+        !((imageCreateInfo.usageFlags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) ||
+          (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT))) {
+        transitionImageLayout(actualImageLayout, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, nullptr);
+    } else if (!((imageCreateInfo.usageFlags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) ||
+                 (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT))) {
+        transitionImageLayout(actualImageLayout, imageLayout, nullptr);
+    }
+}
+
+LveImage::LveImage(LveDevice* device, VkImage image, VkImageView imageView, VkFormat format, VkExtent2D swapChainExtent){
+    this->lveDevice = device;
+    this->imageFormat = format;
+    this->width = swapChainExtent.width;
+    this->height = swapChainExtent.height;
+    this->imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    this->imageView = imageView;
+    this->image = image;
+    this->isSwapchainImage = true;
+
 }
 
 LveImage::~LveImage() {
-    if (sampler != VK_NULL_HANDLE) vkDestroySampler(lveDevice->device(), sampler, nullptr);
+    if (!isSwapchainImage) {
+        if (sampler != VK_NULL_HANDLE) vkDestroySampler(lveDevice->device(), sampler, nullptr);
 
-    if (imageView != VK_NULL_HANDLE) vkDestroyImageView(lveDevice->device(), imageView, nullptr);
+        if (imageView != VK_NULL_HANDLE)
+            vkDestroyImageView(lveDevice->device(), imageView, nullptr);
 
-    if (image != VK_NULL_HANDLE) vkDestroyImage(lveDevice->device(), image, nullptr);
-    vkFreeMemory(lveDevice->device(), imageMemory, nullptr);
+        if (image != VK_NULL_HANDLE) vkDestroyImage(lveDevice->device(), image, nullptr);
+        vkFreeMemory(lveDevice->device(), imageMemory, nullptr);
+    }
 }
 
 void LveImage::createImage(ImageCreateInfo& imageCreateInfo) {
@@ -213,11 +237,6 @@ void LveImage::generateMipmaps() {
             1,
             commandBuffer);
     }
-
-    transitionImageLayout(
-        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        commandBuffer);
     lveDevice->endSingleTimeCommands(commandBuffer);
 }
 

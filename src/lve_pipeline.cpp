@@ -172,7 +172,7 @@ void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
     configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;  // Optional
     configInfo.multisampleInfo.alphaToOneEnable = VK_FALSE;       // Optional
     configInfo.colorBlendAttachment.resize(
-        configInfo.pipelineRessource->getImageColorAttachments().size() + configInfo.pipelineRessource->getExternalImageAttachement().size());
+        configInfo.pipelineRessource->getImageColorAttachments().size());
     
     for (int i = 0; i < configInfo.pipelineRessource->getImageColorAttachments().size(); i++) {
         configInfo.colorBlendAttachment[i].colorWriteMask =

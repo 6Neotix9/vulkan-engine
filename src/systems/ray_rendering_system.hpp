@@ -25,13 +25,13 @@ class RayRenderingSystem : public LveASystem {
 
     void update(FrameInfo &frameInfo, GlobalUbo &ubo);
     void render(FrameInfo &frameInfo);
-    std::vector<std::unique_ptr<LveImage>> previousImages;
+    std::shared_ptr<LveImage> getPreviousImage(uint i) const {return previousImages[i];}
    private:
     void createRandomImage();
     void createDescriptorSet();
     void createPipelineLayout(std::vector<VkDescriptorSetLayout> globalSetLayout) override;
     void createPipeline() override;
-
+    std::vector<std::shared_ptr<LveImage>> previousImages;
     std::unique_ptr<LveDescriptorPool> randomImageDescriptorPool;
     std::unique_ptr<LveDescriptorSetLayout> randomImageDescriptorLayout;
     VkDescriptorSet randomImageDescriptorSet;

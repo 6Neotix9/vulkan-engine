@@ -117,7 +117,7 @@ void FirstApp::run() {
     LveCamera camera{};
 
     auto viewerObject = LveGameObject::createGameObject();
-    viewerObject.transform.translation.z = -2.5f;
+    viewerObject.transform.translation.z = -2.f;
     KeyboardMovementController cameraController{};
 
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -160,6 +160,9 @@ void FirstApp::run() {
 
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
+
+            rayRenderingSystem.getPreviousImage(frameIndex)->
+            LveImage::copyImage(lveDevice, LveImage &srcImage, LveImage &dstImage)
 
             // render
             lveRenderer.beginSwapChainRenderPass(commandBuffer);

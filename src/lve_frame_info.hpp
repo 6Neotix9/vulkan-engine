@@ -28,6 +28,7 @@ struct GlobalUbo {
 
 struct FrameInfo {
   int frameIndex;
+  uint swapchainFrameIndex;
   float frameTime;
   VkExtent2D extent;
   VkCommandBuffer commandBuffer;

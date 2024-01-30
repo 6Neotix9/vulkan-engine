@@ -63,6 +63,9 @@ void LvePipelineRessources::createAttachementImage(
     PipelineRessourcesCreateInfo pipelineRessourcesCreateInfo) {
     for (int i = 0; i < pipelineRessourcesCreateInfo.numberOfImage; i++) {
         std::vector<std::shared_ptr<LveImage>> colorImages;
+        for (auto externalImage : pipelineRessourcesCreateInfo.externalAttachments){
+            colorImages.push_back(externalImage.images[i]);
+        }
         for (auto imageformat : pipelineRessourcesCreateInfo.colorAttachments) {
             ImageCreateInfo imageCreateInfo{};
             imageCreateInfo.usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -96,7 +99,7 @@ void LvePipelineRessources::createRenderPass(
 
     for (auto externalAttachement : pipelineRessourcesCreateInfo.externalAttachments) {
         VkAttachmentDescription externalAttachment = {};
-        externalAttachment.format = externalAttachement.imageformat;
+        externalAttachment.format = externalAttachement.images[0]->getFormat();
         externalAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         externalAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         externalAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -189,11 +192,6 @@ void LvePipelineRessources::createFrameBuffer(
 
     for (size_t i = 0; i < pipelineRessourcesCreateInfo.numberOfImage; i++) {
         std::vector<VkImageView> attachments{};
-
-        for (auto externalAttachement : pipelineRessourcesCreateInfo.externalAttachments) {
-            attachments.push_back(externalAttachement.imageView[i]);
-        }
-
         for (auto colorAttachment : imagesAttachments[i].colorImage) {
             attachments.push_back(colorAttachment->getVkImageView());
         }
