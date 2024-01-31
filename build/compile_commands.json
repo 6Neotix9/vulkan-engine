@@ -1,133 +1,133 @@
 [
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/first_app.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/first_app.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/first_app.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/first_app.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/first_app.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/first_app.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/keyboard_movement_controller.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/keyboard_movement_controller.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/keyboard_movement_controller.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/keyboard_movement_controller.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/keyboard_movement_controller.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/keyboard_movement_controller.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_buffer.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_buffer.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_buffer.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_buffer.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_buffer.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_buffer.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_c_pipeline.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_c_pipeline.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_c_pipeline.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_c_pipeline.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_c_pipeline.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_c_pipeline.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_camera.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_camera.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_camera.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_camera.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_camera.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_camera.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_descriptors.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_descriptors.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_descriptors.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_descriptors.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_descriptors.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_descriptors.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_device.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_device.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_device.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_device.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_device.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_device.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_game_object.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_game_object.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_game_object.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_game_object.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_game_object.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_game_object.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_hot_reload.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_hot_reload.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_hot_reload.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_hot_reload.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_hot_reload.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_hot_reload.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_image.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_image.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_image.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_image.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_image.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_image.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_model.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_model.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_model.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_model.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_model.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_model.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_pipeline.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_pipeline.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_pipeline_ressources.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_pipeline_ressources.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_renderer.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_renderer.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_swap_chain.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_swap_chain.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_swap_chain.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_swap_chain.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_sync.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_sync.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_sync.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_sync.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_window.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_window.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/lve_window.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/lve_window.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/lve_window.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/lve_window.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/main.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/main.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/main.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/main.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/main.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/main.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/lve_A_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/lve_A_system.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/lve_A_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/lve_A_system.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/systems/lve_A_system.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/systems/lve_A_system.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/point_light_system.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/point_light_system.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/systems/point_light_system.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/systems/point_light_system.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/ray_rendering_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/ray_rendering_system.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/ray_rendering_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/ray_rendering_system.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/systems/ray_rendering_system.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/systems/ray_rendering_system.cpp.o"
 },
 {
   "directory": "/home/neo/Documents/dev/vulkan-engine/build",
-  "command": "/usr/bin/g++  -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/simple_render_system.cpp",
+  "command": "/usr/bin/g++ -I/home/neo/Documents/dev/vulkan-engine/external -I/home/neo/Documents/dev/vulkan-engine/src -I/home/neo/Documents/dev/vulkan-engine/external/tinyobjloader -I/home/neo/Documents/dev/vulkan-engine/external/stb_image -g -o CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o -c /home/neo/Documents/dev/vulkan-engine/src/systems/simple_render_system.cpp",
   "file": "/home/neo/Documents/dev/vulkan-engine/src/systems/simple_render_system.cpp",
   "output": "CMakeFiles/LveEngine.dir/src/systems/simple_render_system.cpp.o"
 }

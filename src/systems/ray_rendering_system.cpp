@@ -119,6 +119,7 @@ void RayRenderingSystem::createDescriptorSet() {
         imageCreateInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
         imageCreateInfo.width = 3840;
         imageCreateInfo.height = 2160;
+        imageCreateInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         previousImages[i] = std::make_unique<LveImage>(&lveDevice, imageCreateInfo);
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imageInfo.imageView = previousImages[i]->getVkImageView();

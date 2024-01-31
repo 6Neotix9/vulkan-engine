@@ -143,7 +143,9 @@ void FirstApp::run() {
             int frameIndex = lveRenderer.getFrameIndex();
             FrameInfo frameInfo{
                 frameIndex,
+                lveRenderer.getSwapChainImageIndex(),
                 frameTime,
+                
                 lveRenderer.getSwapChainExtent(),
                 commandBuffer,
                 camera,
@@ -161,9 +163,7 @@ void FirstApp::run() {
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
 
-            rayRenderingSystem.getPreviousImage(frameIndex)->
-            LveImage::copyImage(lveDevice, LveImage &srcImage, LveImage &dstImage)
-
+            
             // render
             lveRenderer.beginSwapChainRenderPass(commandBuffer);
 
@@ -173,6 +173,8 @@ void FirstApp::run() {
             rayRenderingSystem.render(frameInfo);
 
             lveRenderer.endSwapChainRenderPass(commandBuffer);
+            LveImage::copyImage(lveDevice, *lveRenderer.getSwapchainPipeLineRessources()->getImageColorAttachment(frameInfo.swapchainFrameIndex)[1], *rayRenderingSystem.getPreviousImage(frameIndex), commandBuffer);
+
             lveRenderer.endFrame();
         }
     }

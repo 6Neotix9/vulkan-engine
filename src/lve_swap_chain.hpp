@@ -42,6 +42,8 @@ class LveSwapChain {
     uint32_t width() { return swapChainExtent.width; }
     uint32_t height() { return swapChainExtent.height; }
     std::shared_ptr<LvePipelineRessources> getPipelineRessources() { return pipelineRessources; }
+    
+    int getFrameIndex() { return currentFrame; }
 
     float extentAspectRatio() {
         return static_cast<float>(swapChainExtent.width) /

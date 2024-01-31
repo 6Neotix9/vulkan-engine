@@ -72,6 +72,7 @@ void LvePipelineRessources::createAttachementImage(
             imageCreateInfo.format = imageformat;
             imageCreateInfo.width = pipelineRessourcesCreateInfo.width;
             imageCreateInfo.height = pipelineRessourcesCreateInfo.height;
+            imageCreateInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             colorImages.push_back(std::make_shared<LveImage>(lveDevice, imageCreateInfo));
         }
         ImagesAttachment imagesAttachment{colorImages, nullptr};

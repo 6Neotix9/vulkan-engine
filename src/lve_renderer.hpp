@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sys/types.h>
 #include <vulkan/vulkan_core.h>
 #include "lve_device.hpp"
 #include "lve_pipeline_ressources.hpp"
@@ -32,6 +33,10 @@ VkExtent2D getSwapChainExtent() const { return lveSwapChain->getSwapChainExtent(
   int getFrameIndex() const {
     assert(isFrameStarted && "Cannot get frame index when frame not in progress");
     return currentFrameIndex;
+  }
+  uint getSwapChainImageIndex () const {
+    assert(isFrameStarted && "Cannot get swap chain image index when frame not in progress");
+    return currentImageIndex;
   }
 
   VkCommandBuffer beginFrame();

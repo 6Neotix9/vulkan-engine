@@ -41,12 +41,13 @@ class LveImage {
     VkImageView getVkImageView() const { return imageView; }
     VkSampler getVkSampler() const { return sampler; }
     VkImageLayout getVkImageLayout() const { return imageLayout; }
+    VkImageLayout getActualImageLayout() const { return actualImageLayout; }
     int32_t getWidth() const { return width; }
     int32_t getHeight() const { return height; }
     VkFormat getFormat() const { return imageFormat; }
 
     // Static Functions
-    static void copyImage(LveDevice& device, LveImage& srcImage, LveImage& dstImage);
+    static void copyImage(LveDevice& device, LveImage& srcImage, LveImage& dstImage, VkCommandBuffer commandBuffer = VK_NULL_HANDLE);
 
    private:
     int32_t width = 0;

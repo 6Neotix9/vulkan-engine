@@ -47,7 +47,7 @@ class LvePipelineRessources {
         return imagesAttachments[0].colorImage;
     }
 
-    std::vector<std::shared_ptr<LveImage>> getImageColorAttachments(uint i){
+    std::vector<std::shared_ptr<LveImage>> getImageColorAttachment(uint i){
         return imagesAttachments[i].colorImage;
     }
 

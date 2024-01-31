@@ -9,8 +9,8 @@ const uint Plan = 0x00000006u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 16;
-const uint DOM_LIGHT = 16;
+const uint ANTI_ALIASING_FACTOR = 6;
+const uint DOM_LIGHT = 4;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
@@ -61,15 +61,28 @@ struct Point {
     float dist;
 };
 
-struct RandomSeed {
-    vec2 v2;
-    float time;
-    int iteration;
-};
-vec2 random(inout vec2 seed) {
-    vec2 truc = fract(4*texture(randomImage, seed).rg);
-    seed = seed+0.01;
-    return truc;
+// Construct a float with half-open range [0:1] using low 23 bits.
+// All zeroes yields 0.0, all ones yields the next smallest representable value below 1.0.
+float floatConstruct(uint m) {
+    const uint ieeeMantissa = 0x007FFFFFu;  // binary32 mantissa bitmask
+    const uint ieeeOne = 0x3F800000u;       // 1.0 in IEEE binary32
+
+    m &= ieeeMantissa;  // Keep only mantissa bits (fractional part)
+    m |= ieeeOne;       // Add fractional part to 1.0
+
+    float f = uintBitsToFloat(m);  // Range [1:2]
+    return f - 1.0;                // Range [0:1]
+}
+
+float random(inout uint seed) {
+    uint x = seed;
+    x ^= x >> 16;
+    x *= 0x21f0aaad;
+    x ^= x >> 15;
+    x *= 0xd35a2d97;
+    x ^= x >> 15;
+    seed++;
+    return floatConstruct(x);
 }
 
 Ray createRay(in vec2 px) {
@@ -131,7 +144,7 @@ Point intersect_plan(in Object plan, in Ray ray) {
     } else {
         color = vec3(0., 0., 0.);
     }
-    return Point(hitCoord, plan.color, plan.normal, d);
+    return Point(hitCoord, color, plan.normal, d);
 }
 
 Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
@@ -188,17 +201,21 @@ void main() {
     float dist;
     vec3 color = vec3(0, 0, 0);
     vec2 coord = gl_FragCoord.xy;
-    vec2 rseed = (coord / vec2(3840, 2160)) + fract(ubo.frameTime) ;
+    vec2 randomSeed = texture(randomImage, coord / vec2(3840, 2160)).rg;
+    uint rseed = uint((randomSeed.r + randomSeed.g) * 10 * ubo.frameTime * 10);
     vec3 sunDir = normalize(vec3(1, -1, 1));
+    vec3 sunColor = vec3(1, 1, 1);
     vec3 ImageColor = {0, 0, 0};
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
-        Ray ray = createRay(coord + random(rseed) - vec2(0.5, 0.5));
+        vec2 randomRayDir = vec2(random(rseed), random(rseed));
+
+        Ray ray = createRay(coord + randomRayDir - vec2(0.5, 0.5));
 
         // intersect
 
         Point finalP = intersect(ray, objects, nbOfObjects, dist);
         if (!(dist == 1.0 / 0.0 || dist < 0)) {
-            color = finalP.color * (max(0, dot(normalize(finalP.normal), normalize(sunDir))));
+            color = finalP.color * (max(0, dot(normalize(finalP.normal), normalize(sunDir)))) * sunColor;
             finalP.pos = finalP.pos + 0.001 * finalP.normal;
             if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
                 color = color * 0.;
@@ -206,31 +223,34 @@ void main() {
             if (DOM_LIGHT > 0) {
                 vec3 lighDomeColor = vec3(0, 0, 0);
                 for (int j = 0; j < DOM_LIGHT; j++) {
-                    vec2 randomNum = random(rseed);
+                    vec2 randomNum = vec2(random(rseed), random(rseed));
                     float r1 = randomNum.x;
                     float r2 = randomNum.y;
                     float theta = r1 * PI;
                     float phi = r2 * 2 * PI;
-                   
+
                     vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
                     if (dot(d, finalP.normal) > 0) {
-                        vec3 temp = finalP.color * (max(0, dot(normalize(finalP.normal), d)));
+                        vec3 temp = finalP.color * (max(0, dot(normalize(finalP.normal), d))) * sunColor;
                         if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
                             temp = color * 0.;
                         }
                         lighDomeColor += temp;
                     }
                 }
-                color = color*0.5  + (lighDomeColor / float(DOM_LIGHT)) * 0.5;
+                color = color * 0.5 + (lighDomeColor / float(DOM_LIGHT)) * 0.5;
             }
 
             ImageColor += color;
+        } else {
+            ImageColor += vec3(0.502, 0.869, 1);
         }
     }
+
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
-    
+    //finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
+
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
-
-
+    // outColor = vec4(random(rseed), random(rseed), random(rseed), 1);
 }

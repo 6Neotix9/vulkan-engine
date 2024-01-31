@@ -41,16 +41,21 @@ LveImage::LveImage(LveDevice* device, ImageCreateInfo& imageCreateInfo) : lveDev
     }
 }
 
-LveImage::LveImage(LveDevice* device, VkImage image, VkImageView imageView, VkFormat format, VkExtent2D swapChainExtent){
+LveImage::LveImage(
+    LveDevice* device,
+    VkImage image,
+    VkImageView imageView,
+    VkFormat format,
+    VkExtent2D swapChainExtent) {
     this->lveDevice = device;
     this->imageFormat = format;
     this->width = swapChainExtent.width;
     this->height = swapChainExtent.height;
     this->imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    this->actualImageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     this->imageView = imageView;
     this->image = image;
     this->isSwapchainImage = true;
-
 }
 
 LveImage::~LveImage() {
@@ -76,6 +81,10 @@ void LveImage::createImage(ImageCreateInfo& imageCreateInfo) {
     if (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_STORAGE_BIT) {
         imageCreateInfo.usageFlags |=
             VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    }
+    if (imageCreateInfo.usageFlags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
+        imageCreateInfo.usageFlags |=
+            VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     }
 
     VkImageCreateInfo imageInfo{};
@@ -242,6 +251,10 @@ void LveImage::generateMipmaps() {
 
 void LveImage::transitionImageLayout(
     VkImageLayout oldLayout, VkImageLayout newLayout, VkCommandBuffer externalCommandBuffer) {
+    if (newLayout == VK_IMAGE_LAYOUT_UNDEFINED){
+        actualImageLayout = newLayout;
+        return;
+    }
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.oldLayout = oldLayout;                          // VK_IMAGE_LAYOUT_UNDEFINED
@@ -584,11 +597,13 @@ VkAccessFlags LveImage::getAccessFlagsFromLayout(VkImageLayout layout) {
     }
 }
 
-void LveImage::copyImage(LveDevice& device, LveImage& srcImage, LveImage& dstImage) {
-    VkCommandBuffer commandBuffer = device.beginSingleTimeCommands();
-
-    VkImageLayout srcImageLayout = srcImage.getVkImageLayout();
-    VkImageLayout dstImageLayout = dstImage.getVkImageLayout();
+void LveImage::copyImage(LveDevice& device, LveImage& srcImage, LveImage& dstImage, VkCommandBuffer externalCommandBuffer) {
+    VkCommandBuffer commandBuffer = externalCommandBuffer;
+    if (externalCommandBuffer == VK_NULL_HANDLE)
+         commandBuffer = device.beginSingleTimeCommands();
+    
+    VkImageLayout srcImageLayout = srcImage.getActualImageLayout();
+    VkImageLayout dstImageLayout = dstImage.getActualImageLayout();
 
     srcImage.transitionImageLayout(
         srcImageLayout,
@@ -622,16 +637,19 @@ void LveImage::copyImage(LveDevice& device, LveImage& srcImage, LveImage& dstIma
         1,
         &blit,
         VK_FILTER_LINEAR);
-
-    srcImage.transitionImageLayout(
-        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-        srcImageLayout,
-        commandBuffer);
-    dstImage.transitionImageLayout(
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        dstImageLayout,
-        commandBuffer);
-
-    device.endSingleTimeCommands(commandBuffer);
+    
+        srcImage.transitionImageLayout(
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            srcImageLayout,
+            commandBuffer);
+    
+    
+        dstImage.transitionImageLayout(
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            dstImageLayout,
+            commandBuffer);
+    
+    if (externalCommandBuffer == VK_NULL_HANDLE)
+        device.endSingleTimeCommands(commandBuffer);
 }
 }  // namespace lve
