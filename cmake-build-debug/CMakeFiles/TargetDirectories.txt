@@ -1,4 +1,0 @@
-/home/neo/Documents/dev/littleVulkanEngine/cmake-build-debug/CMakeFiles/LveEngine.dir
-/home/neo/Documents/dev/littleVulkanEngine/cmake-build-debug/CMakeFiles/Shaders.dir
-/home/neo/Documents/dev/littleVulkanEngine/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/neo/Documents/dev/littleVulkanEngine/cmake-build-debug/CMakeFiles/rebuild_cache.dir
