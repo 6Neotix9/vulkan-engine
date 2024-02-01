@@ -6,10 +6,11 @@ const uint INTER = 0x00000003u;
 const uint SUB = 0x00000004u;
 const uint Sphere = 0x00000005u;
 const uint Plan = 0x00000006u;
+const uint Box = 0x00000007u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 6;
+const uint ANTI_ALIASING_FACTOR = 4;
 const uint DOM_LIGHT = 4;
 
 layout(location = 0) in vec2 fragOffset;
@@ -43,10 +44,12 @@ struct Object {
     uint type;
     uint objectL;
     uint objectR;
+
     vec3 pos;
     vec3 color;
-    vec3 normal;
-    float size;
+    vec3 orientation;
+    vec3 size;
+
 };
 
 struct Ray {
@@ -85,6 +88,26 @@ float random(inout uint seed) {
     return floatConstruct(x);
 }
 
+mat4 rotationAxisAngle( vec3 v, float angle )
+{
+    float s = sin( angle );
+    float c = cos( angle );
+    float ic = 1.0 - c;
+
+    return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                 v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                 v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+			     0.0,                0.0,                0.0,                1.0 );
+}
+
+mat4 translate( float x, float y, float z )
+{
+    return mat4( 1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 x,   y,   z,   1.0 );
+}
+
 Ray createRay(in vec2 px) {
     // convert pixel to NDS
     vec2 pxNDS = (px / (push.resolution)) * 2. - 1.;
@@ -115,7 +138,7 @@ Point intersect_sphere(in Object s, in Ray ray) {
     float a = dot(ray.rd, ray.rd);
 
     float b = 2 * dot(ray.rd, ray.ro - s.pos);
-    float k = dot(ray.ro - s.pos, ray.ro - s.pos) - s.size * s.size;
+    float k = dot(ray.ro - s.pos, ray.ro - s.pos) - s.size[0] * s.size[0];
     float dd = b * b - 4 * a * k;
     float d = 1.0 / 0.0;
     if (dd > 0) {
@@ -134,7 +157,7 @@ Point intersect_sphere(in Object s, in Ray ray) {
 }
 
 Point intersect_plan(in Object plan, in Ray ray) {
-    float d = dot(plan.normal, (plan.pos - ray.ro) / dot(plan.normal, ray.rd));
+    float d = dot(plan.orientation, (plan.pos - ray.ro) / dot(plan.orientation, ray.rd));
 
     vec3 hitCoord = ray.ro + ray.rd * d;
     vec2 hitCoord2d = mod(hitCoord.xz, 4.0);
@@ -144,7 +167,35 @@ Point intersect_plan(in Object plan, in Ray ray) {
     } else {
         color = vec3(0., 0., 0.);
     }
-    return Point(hitCoord, color, plan.normal, d);
+    return Point(hitCoord, color, plan.orientation, d);
+}
+
+//Source : Inigo Quilez sur shaderToy
+Point intersect_box(in Object box, in Ray ray) {
+    float d = 1.0 / 0.0;
+    vec3 m = 1.0 / ray.rd;  // can precompute if traversing a set of aligned boxes
+    vec3 n = m * ray.ro;    // can precompute if traversing a set of aligned boxes
+    vec3 k = abs(m) * box.size;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) {
+        return Point(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 1.0 / 0.0);  // no intersection
+    }
+
+    if (tN < tF && tN > 0) {
+        d = tN;
+    } else if (tF > 0) {
+        d = tF;
+    } else if (tN > 0) {
+        d = tN;
+    }
+
+    vec3 outNormal = (tN > 0.0) ? step(vec3(tN), t1) : step(t2, vec3(tF));
+    outNormal *= -sign(ray.rd);
+
+    return Point(ray.ro + ray.rd * d, box.color, outNormal, d);
 }
 
 Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
@@ -161,6 +212,9 @@ Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out
                 break;
             case Plan:
                 p = intersect_plan(obj, ray);
+                break;
+            case Box:
+                p = intersect_box(obj, ray);
                 break;
         }
         if (p.dist < dist && p.dist > 0 && p.dist != 1.0 / 0.0) {
@@ -185,14 +239,17 @@ bool checkIfShadow(
 
 void main() {
     // Create objects
-    Object plan = Object(Plan, 0, 0, vec3(0, 1, 0), vec3(1, 1, 1), vec3(0, -1, 0), 0);
-    Object sphere = Object(Sphere, 0, 0, vec3(0, -1, 0), vec3(0.1, 0.2, 0.8), vec3(0, 0, 0), 2);
-    Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(1, 0.2, 0.8), vec3(0, 0, 0), 13);
+    Object plan = Object(Plan, 0, 0, vec3(0, 1, 0), vec3(1, 1, 1), vec3(0, -1, 0), vec3(0));
+    Object sphere = Object(Sphere, 0, 0, vec3(0, -1, 0), vec3(0.1, 0.2, 0.8), vec3(0), vec3(2));
+    Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(1, 0.2, 0.8), vec3(0), vec3(13));
+    Object box = Object(Box, 0, 0, vec3(-0, -0, -0), vec3(0.3, 0.2, 0.8), vec3(0), vec3(40,4,40));
+    
     Object objects[100];
     objects[0] = plan;
     objects[1] = sphere;
     objects[2] = spher2;
-    uint nbOfObjects = 3;
+    objects[3] = box;
+    uint nbOfObjects = 4;
 
     // create variable
 
@@ -215,7 +272,8 @@ void main() {
 
         Point finalP = intersect(ray, objects, nbOfObjects, dist);
         if (!(dist == 1.0 / 0.0 || dist < 0)) {
-            color = finalP.color * (max(0, dot(normalize(finalP.normal), normalize(sunDir)))) * sunColor;
+            color = finalP.color * (max(0, dot(normalize(finalP.normal), normalize(sunDir)))) *
+                    sunColor;
             finalP.pos = finalP.pos + 0.001 * finalP.normal;
             if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
                 color = color * 0.;
@@ -231,7 +289,8 @@ void main() {
 
                     vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
                     if (dot(d, finalP.normal) > 0) {
-                        vec3 temp = finalP.color * (max(0, dot(normalize(finalP.normal), d))) * sunColor;
+                        vec3 temp =
+                            finalP.color * (max(0, dot(normalize(finalP.normal), d))) * sunColor;
                         if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
                             temp = color * 0.;
                         }
@@ -248,7 +307,7 @@ void main() {
     }
 
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
-    //finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
+    finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
 
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
