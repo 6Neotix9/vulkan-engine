@@ -10,8 +10,8 @@ const uint Box = 0x00000007u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 4;
-const uint DOM_LIGHT = 4;
+const uint ANTI_ALIASING_FACTOR = 32;
+const uint DOM_LIGHT = 8;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
@@ -40,16 +40,20 @@ layout(set = 2, binding = 0) uniform sampler2D previousImage;
 layout(push_constant) uniform Push { vec2 resolution; }
 push;
 
+struct TransformComponent {
+    vec3 translation;
+    vec3 scale;
+    vec3 rotation;
+};
+
 struct Object {
     uint type;
     uint objectL;
     uint objectR;
-
-    vec3 pos;
+    mat4 modelMatrix;
+    mat3 normalMatrix;
     vec3 color;
-    vec3 orientation;
-    vec3 size;
-
+    // vec3 size;
 };
 
 struct Ray {
@@ -65,7 +69,8 @@ struct Point {
 };
 
 // Construct a float with half-open range [0:1] using low 23 bits.
-// All zeroes yields 0.0, all ones yields the next smallest representable value below 1.0.
+// All zeroes yields 0.0, all ones yields the next smallest representable value
+// below 1.0.
 float floatConstruct(uint m) {
     const uint ieeeMantissa = 0x007FFFFFu;  // binary32 mantissa bitmask
     const uint ieeeOne = 0x3F800000u;       // 1.0 in IEEE binary32
@@ -86,26 +91,6 @@ float random(inout uint seed) {
     x ^= x >> 15;
     seed++;
     return floatConstruct(x);
-}
-
-mat4 rotationAxisAngle( vec3 v, float angle )
-{
-    float s = sin( angle );
-    float c = cos( angle );
-    float ic = 1.0 - c;
-
-    return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
-                 v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
-                 v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
-			     0.0,                0.0,                0.0,                1.0 );
-}
-
-mat4 translate( float x, float y, float z )
-{
-    return mat4( 1.0, 0.0, 0.0, 0.0,
-				 0.0, 1.0, 0.0, 0.0,
-				 0.0, 0.0, 1.0, 0.0,
-				 x,   y,   z,   1.0 );
 }
 
 Ray createRay(in vec2 px) {
@@ -134,11 +119,64 @@ Ray createRay(in vec2 px) {
     return Ray(ro, rd);
 }
 
-Point intersect_sphere(in Object s, in Ray ray) {
-    float a = dot(ray.rd, ray.rd);
+mat4 createModelMatrix(in TransformComponent t) {
+    const float c3 = cos(t.rotation.z);
+    const float s3 = sin(t.rotation.z);
+    const float c2 = cos(t.rotation.x);
+    const float s2 = sin(t.rotation.x);
+    const float c1 = cos(t.rotation.y);
+    const float s1 = sin(t.rotation.y);
+    mat4 matrix = mat4(
+        vec4(
+            t.scale.x * (c1 * c3 + s1 * s2 * s3),
+            t.scale.x * (c2 * s3),
+            t.scale.x * (c1 * s2 * s3 - c3 * s1),
+            0.),
+        vec4(
+            t.scale.y * (c3 * s1 * s2 - c1 * s3),
+            t.scale.y * (c2 * c3),
+            t.scale.y * (c1 * c3 * s2 + s1 * s3),
+            0.),
+        vec4(t.scale.z * (c2 * s1), t.scale.z * (-s2), t.scale.z * (c1 * c2), 0.),
+        vec4(t.translation.x, t.translation.y, t.translation.z, 1.0));
+    return transpose(matrix);
+}
 
-    float b = 2 * dot(ray.rd, ray.ro - s.pos);
-    float k = dot(ray.ro - s.pos, ray.ro - s.pos) - s.size[0] * s.size[0];
+mat3 createNormalMatrix(in TransformComponent t) {
+    const float c3 = cos(t.rotation.z);
+    const float s3 = sin(t.rotation.z);
+    const float c2 = cos(t.rotation.x);
+    const float s2 = sin(t.rotation.x);
+    const float c1 = cos(t.rotation.y);
+    const float s1 = sin(t.rotation.y);
+    const vec3 invScale = 1.0f / t.scale;
+    mat3 normalMatrix = mat3(
+        vec3(
+            invScale.x * (c1 * c3 + s1 * s2 * s3),
+            invScale.x * (c2 * s3),
+            invScale.x * (c1 * s2 * s3 - c3 * s1)),
+        vec3(
+            invScale.y * (c3 * s1 * s2 - c1 * s3),
+            invScale.y * (c2 * c3),
+            invScale.y * (c1 * c3 * s2 + s1 * s3)),
+        vec3(invScale.z * (c2 * s1), invScale.z * (-s2), invScale.z * (c1 * c2)));
+    return transpose(normalMatrix);
+}
+
+Object createObject(
+    in uint type, in uint objectL, in uint objectR, in TransformComponent t, in vec3 color) {
+    mat4 modelMatrix = createModelMatrix(t);
+    mat3 normalMatrix = createNormalMatrix(t);
+    return Object(type, objectL, objectR, modelMatrix, normalMatrix, color);
+}
+
+Point intersect_sphere(in Object s, in Ray ray) {
+    vec3 ro = (vec4(ray.ro, 1.0) * inverse(s.modelMatrix)).xyz;
+    vec3 rd = (vec4(ray.rd, .0) * inverse(s.modelMatrix)).xyz;
+    vec3 pos = {s.modelMatrix[0].w, s.modelMatrix[1].w, s.modelMatrix[2].w};
+    float a = dot(rd, rd);
+    float b = 2 * dot(rd, ro);
+    float k = dot(ro, ro) - 1 * 1;
     float dd = b * b - 4 * a * k;
     float d = 1.0 / 0.0;
     if (dd > 0) {
@@ -153,13 +191,22 @@ Point intersect_sphere(in Object s, in Ray ray) {
             d = t1;
         }
     }
-    return Point(ray.ro + ray.rd * d, s.color, normalize(ray.ro + ray.rd * d - s.pos), d);
+    vec3 hitCoord = ray.ro + ray.rd * d;
+    vec3 normal = normalize((ro + rd * d));
+    normal = (normal * s.normalMatrix ).xyz;
+    return Point(hitCoord, s.color, normal, d);
 }
 
 Point intersect_plan(in Object plan, in Ray ray) {
-    float d = dot(plan.orientation, (plan.pos - ray.ro) / dot(plan.orientation, ray.rd));
+    vec3 ro = (vec4(ray.ro, 1.0) * inverse(plan.modelMatrix)).xyz;
+    vec3 rd = (vec4(ray.rd, 0.0) * inverse(plan.modelMatrix)).xyz;
+
+    vec3 pos = {plan.modelMatrix[0].w, plan.modelMatrix[1].w, plan.modelMatrix[2].w};
+
+    float d = dot(vec3(0, -1, 0), vec3(-ro)) / dot(vec3(0, -1, 0), rd);
 
     vec3 hitCoord = ray.ro + ray.rd * d;
+    vec3 normal = vec3(0, -1, 0);
     vec2 hitCoord2d = mod(hitCoord.xz, 4.0);
     vec3 color;
     if ((hitCoord2d.x > 2 && hitCoord2d.y > 2) || (hitCoord2d.x < 2 && hitCoord2d.y < 2)) {
@@ -167,36 +214,35 @@ Point intersect_plan(in Object plan, in Ray ray) {
     } else {
         color = vec3(0., 0., 0.);
     }
-    return Point(hitCoord, color, plan.orientation, d);
+
+    return Point(hitCoord, plan.color, normal, d);
 }
 
-//Source : Inigo Quilez sur shaderToy
-Point intersect_box(in Object box, in Ray ray) {
-    float d = 1.0 / 0.0;
-    vec3 m = 1.0 / ray.rd;  // can precompute if traversing a set of aligned boxes
-    vec3 n = m * ray.ro;    // can precompute if traversing a set of aligned boxes
-    vec3 k = abs(m) * box.size;
-    vec3 t1 = -n - k;
-    vec3 t2 = -n + k;
-    float tN = max(max(t1.x, t1.y), t1.z);
-    float tF = min(min(t2.x, t2.y), t2.z);
-    if (tN > tF || tF < 0.0) {
-        return Point(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 1.0 / 0.0);  // no intersection
-    }
+// // Source : Inigo Quilez sur shaderToy
+// Point intersect_box(in Object box, in Ray ray) {
+//   float d = 1.0 / 0.0;
+//   vec3 m = 1.0 / ray.rd; // can precompute if traversing a set of aligned
+//   boxes vec3 n = m * ray.ro;   // can precompute if traversing a set of
+//   aligned boxes vec3 k = abs(m) * box.size; vec3 t1 = -n - k; vec3 t2 = -n +
+//   k; float tN = max(max(t1.x, t1.y), t1.z); float tF = min(min(t2.x, t2.y),
+//   t2.z); if (tN > tF || tF < 0.0) {
+//     return Point(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0),
+//                  1.0 / 0.0); // no intersection
+//   }
 
-    if (tN < tF && tN > 0) {
-        d = tN;
-    } else if (tF > 0) {
-        d = tF;
-    } else if (tN > 0) {
-        d = tN;
-    }
+//   if (tN < tF && tN > 0) {
+//     d = tN;
+//   } else if (tF > 0) {
+//     d = tF;
+//   } else if (tN > 0) {
+//     d = tN;
+//   }
 
-    vec3 outNormal = (tN > 0.0) ? step(vec3(tN), t1) : step(t2, vec3(tF));
-    outNormal *= -sign(ray.rd);
+//   vec3 outNormal = (tN > 0.0) ? step(vec3(tN), t1) : step(t2, vec3(tF));
+//   outNormal *= -sign(ray.rd);
 
-    return Point(ray.ro + ray.rd * d, box.color, outNormal, d);
-}
+//   return Point(ray.ro + ray.rd * d, box.color, outNormal, d);
+// }
 
 Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
     Point p;
@@ -214,7 +260,7 @@ Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out
                 p = intersect_plan(obj, ray);
                 break;
             case Box:
-                p = intersect_box(obj, ray);
+                // p = intersect_box(obj, ray);
                 break;
         }
         if (p.dist < dist && p.dist > 0 && p.dist != 1.0 / 0.0) {
@@ -238,18 +284,67 @@ bool checkIfShadow(
 }
 
 void main() {
-    // Create objects
-    Object plan = Object(Plan, 0, 0, vec3(0, 1, 0), vec3(1, 1, 1), vec3(0, -1, 0), vec3(0));
-    Object sphere = Object(Sphere, 0, 0, vec3(0, -1, 0), vec3(0.1, 0.2, 0.8), vec3(0), vec3(2));
-    Object spher2 = Object(Sphere, 0, 0, vec3(-0, -40, -0), vec3(1, 0.2, 0.8), vec3(0), vec3(13));
-    Object box = Object(Box, 0, 0, vec3(-0, -0, -0), vec3(0.3, 0.2, 0.8), vec3(0), vec3(40,4,40));
+    Object plan = createObject(
+        Plan,
+        0,
+        0,
+        TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
+        vec3(1, 1, 1));
+    // Object sphere = createObject(
+    //     Sphere,
+    //     0,
+    //     0,
+    //     TransformComponent(vec3(0, 0, 0), vec3(2, 40, 2), vec3(0, 0, 0)),
+    //     vec3(1, 0, 0));
+
+
+    //plane made with sphere
+
+    vec3 generalPosition = vec3(0*15, -45, 0);
+
+    Object mainPart = createObject(
+        Sphere,
+        0,
+        0,
+        TransformComponent(vec3(0, 0, 0) + generalPosition, vec3(4, 1, 1), vec3(0, 0, 0)),
+        vec3(0.2, 0.4, 0.4));
+    Object rightWing = createObject(
+        Sphere,
+        0,
+        0,
+        TransformComponent(vec3(0, 0, -1.5) + generalPosition, vec3(1, 0.25, 2.2), vec3(0, -0.75, 0)),
+        vec3(0.2, 0.4, 0.4));
+
+    Object leftWing = createObject(
+        Sphere,
+        0,
+        0,
+        TransformComponent(vec3(0, 0, 1.5) + generalPosition, vec3(1, 0.25, 2.2), vec3(0, 0.75, 0)),
+        vec3(0.2, 0.4, 0.4));
+
+    Object horizontalStab = createObject(
+        Sphere,
+        0,
+        0,
+        TransformComponent(vec3(3.3, 0, 0) + generalPosition, vec3(0.5, 0.1, 2), vec3(0, 0., 0)),
+        vec3(0.2, 0.4, 0.4));
     
+    Object verticalStab = createObject(
+        Sphere,
+        0,
+        0,
+        TransformComponent(vec3(4, -.6, 0) + generalPosition, vec3(0.35, 1, 0.1), vec3(0, 0., 0.5)),
+        vec3(0.2, 0.4, 0.4));
+
     Object objects[100];
     objects[0] = plan;
-    objects[1] = sphere;
-    objects[2] = spher2;
-    objects[3] = box;
-    uint nbOfObjects = 4;
+
+    objects[3] = mainPart;
+    objects[4] = rightWing;
+    objects[5] = leftWing;
+    objects[6] = horizontalStab;
+    objects[7] = verticalStab;
+    uint nbOfObjects = 8;
 
     // create variable
 
@@ -260,7 +355,7 @@ void main() {
     vec2 coord = gl_FragCoord.xy;
     vec2 randomSeed = texture(randomImage, coord / vec2(3840, 2160)).rg;
     uint rseed = uint((randomSeed.r + randomSeed.g) * 10 * ubo.frameTime * 10);
-    vec3 sunDir = normalize(vec3(1, -1, 1));
+    vec3 sunDir = normalize(vec3(0.5, -1, -0.5));
     vec3 sunColor = vec3(1, 1, 1);
     vec3 ImageColor = {0, 0, 0};
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {

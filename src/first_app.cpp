@@ -13,7 +13,6 @@
 #include "systems/ray_rendering_system.hpp"
 #include "systems/simple_render_system.hpp"
 
-
 // libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -26,8 +25,8 @@
 #include <array>
 #include <cassert>
 #include <chrono>
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 namespace lve {
 
 FirstApp::FirstApp() {
@@ -42,22 +41,14 @@ FirstApp::FirstApp() {
     loadGameObjects();
 }
 
-FirstApp::~FirstApp() {
-}
-
-
-
+FirstApp::~FirstApp() {}
 
 void FirstApp::run() {
-
-    
-    
     ImageCreateInfo imageCreateInfo{};
     imageCreateInfo.filename = "textures/truc.jpg";
     imageCreateInfo.usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT;
     imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
     LveImage image{&lveDevice, imageCreateInfo};
-
 
     PipelineRessourcesCreateInfo test{};
     test.colorAttachments = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_R16G16B16A16_SNORM};
@@ -67,7 +58,6 @@ void FirstApp::run() {
     test.height = 720;
 
     // LvePipelineRessources t {test, lveDevice};
-
 
     std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
     for (int i = 0; i < uboBuffers.size(); i++) {
@@ -109,7 +99,6 @@ void FirstApp::run() {
         lveRenderer.getSwapchainPipeLineRessources(),
         globalSetLayout->getDescriptorSetLayout()};
 
-
     RayRenderingSystem rayRenderingSystem{
         lveDevice,
         lveRenderer.getSwapchainPipeLineRessources(),
@@ -145,7 +134,7 @@ void FirstApp::run() {
                 frameIndex,
                 lveRenderer.getSwapChainImageIndex(),
                 frameTime,
-                
+
                 lveRenderer.getSwapChainExtent(),
                 commandBuffer,
                 camera,
@@ -163,7 +152,6 @@ void FirstApp::run() {
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
 
-            
             // render
             lveRenderer.beginSwapChainRenderPass(commandBuffer);
 
@@ -173,7 +161,12 @@ void FirstApp::run() {
             rayRenderingSystem.render(frameInfo);
 
             lveRenderer.endSwapChainRenderPass(commandBuffer);
-            LveImage::copyImage(lveDevice, *lveRenderer.getSwapchainPipeLineRessources()->getImageColorAttachment(frameInfo.swapchainFrameIndex)[1], *rayRenderingSystem.getPreviousImage(frameIndex), commandBuffer);
+            LveImage::copyImage(
+                lveDevice,
+                *lveRenderer.getSwapchainPipeLineRessources()->getImageColorAttachment(
+                    frameInfo.swapchainFrameIndex)[1],
+                *rayRenderingSystem.getPreviousImage(frameIndex),
+                commandBuffer);
 
             lveRenderer.endFrame();
         }
