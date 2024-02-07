@@ -10,8 +10,8 @@ const uint Box = 0x00000007u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 32;
-const uint DOM_LIGHT = 8;
+const uint ANTI_ALIASING_FACTOR = 8;
+const uint DOM_LIGHT = 4;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
@@ -119,6 +119,12 @@ Ray createRay(in vec2 px) {
     return Ray(ro, rd);
 }
 
+Ray Bendray(in Ray r, in float bendAngle ){
+    float bendSign = bendAngle < 0 ? -1 : 1;
+    
+    return r;
+}
+
 mat4 createModelMatrix(in TransformComponent t) {
     const float c3 = cos(t.rotation.z);
     const float s3 = sin(t.rotation.z);
@@ -128,15 +134,11 @@ mat4 createModelMatrix(in TransformComponent t) {
     const float s1 = sin(t.rotation.y);
     mat4 matrix = mat4(
         vec4(
-            t.scale.x * (c1 * c3 + s1 * s2 * s3),
-            t.scale.x * (c2 * s3),
-            t.scale.x * (c1 * s2 * s3 - c3 * s1),
-            0.),
+            t.scale.x * (c1 * c3 + s1 * s2 * s3), t.scale.x * (c2 * s3),
+            t.scale.x * (c1 * s2 * s3 - c3 * s1), 0.),
         vec4(
-            t.scale.y * (c3 * s1 * s2 - c1 * s3),
-            t.scale.y * (c2 * c3),
-            t.scale.y * (c1 * c3 * s2 + s1 * s3),
-            0.),
+            t.scale.y * (c3 * s1 * s2 - c1 * s3), t.scale.y * (c2 * c3),
+            t.scale.y * (c1 * c3 * s2 + s1 * s3), 0.),
         vec4(t.scale.z * (c2 * s1), t.scale.z * (-s2), t.scale.z * (c1 * c2), 0.),
         vec4(t.translation.x, t.translation.y, t.translation.z, 1.0));
     return transpose(matrix);
@@ -152,12 +154,10 @@ mat3 createNormalMatrix(in TransformComponent t) {
     const vec3 invScale = 1.0f / t.scale;
     mat3 normalMatrix = mat3(
         vec3(
-            invScale.x * (c1 * c3 + s1 * s2 * s3),
-            invScale.x * (c2 * s3),
+            invScale.x * (c1 * c3 + s1 * s2 * s3), invScale.x * (c2 * s3),
             invScale.x * (c1 * s2 * s3 - c3 * s1)),
         vec3(
-            invScale.y * (c3 * s1 * s2 - c1 * s3),
-            invScale.y * (c2 * c3),
+            invScale.y * (c3 * s1 * s2 - c1 * s3), invScale.y * (c2 * c3),
             invScale.y * (c1 * c3 * s2 + s1 * s3)),
         vec3(invScale.z * (c2 * s1), invScale.z * (-s2), invScale.z * (c1 * c2)));
     return transpose(normalMatrix);
@@ -193,7 +193,7 @@ Point intersect_sphere(in Object s, in Ray ray) {
     }
     vec3 hitCoord = ray.ro + ray.rd * d;
     vec3 normal = normalize((ro + rd * d));
-    normal = (normal * s.normalMatrix ).xyz;
+    normal = (normal * s.normalMatrix).xyz;
     return Point(hitCoord, s.color, normal, d);
 }
 
@@ -218,31 +218,39 @@ Point intersect_plan(in Object plan, in Ray ray) {
     return Point(hitCoord, plan.color, normal, d);
 }
 
-// // Source : Inigo Quilez sur shaderToy
-// Point intersect_box(in Object box, in Ray ray) {
-//   float d = 1.0 / 0.0;
-//   vec3 m = 1.0 / ray.rd; // can precompute if traversing a set of aligned
-//   boxes vec3 n = m * ray.ro;   // can precompute if traversing a set of
-//   aligned boxes vec3 k = abs(m) * box.size; vec3 t1 = -n - k; vec3 t2 = -n +
-//   k; float tN = max(max(t1.x, t1.y), t1.z); float tF = min(min(t2.x, t2.y),
-//   t2.z); if (tN > tF || tF < 0.0) {
-//     return Point(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0),
-//                  1.0 / 0.0); // no intersection
-//   }
+// Source : Inigo Quilez sur shaderToy
+Point intersect_box(in Object box, in Ray ray) {
+    vec3 ro = (vec4(ray.ro, 1.0) * inverse(box.modelMatrix)).xyz;
+    vec3 rd = (vec4(ray.rd, 0.0) * inverse(box.modelMatrix)).xyz;
+    float d = 1.0 / 0.0;
+    vec3 m = 1.0 / rd;  // can precompute if traversing a set of aligned boxes
+    vec3 n = m * ro;        // can precompute if traversing a set of aligned boxes
+    vec3 k = abs(m);
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) {
+        return Point(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0),
+                     1.0 / 0.0);  // no intersection
+    }
 
-//   if (tN < tF && tN > 0) {
-//     d = tN;
-//   } else if (tF > 0) {
-//     d = tF;
-//   } else if (tN > 0) {
-//     d = tN;
-//   }
+    if (tN < tF && tN > 0) {
+        d = tN;
+    } else if (tF > 0) {
+        d = tF;
+    } else if (tN > 0) {
+        d = tN;
+    }
 
-//   vec3 outNormal = (tN > 0.0) ? step(vec3(tN), t1) : step(t2, vec3(tF));
-//   outNormal *= -sign(ray.rd);
+    vec3 outNormal = (tN > 0.0) ? step(vec3(tN), t1) : step(t2, vec3(tF));
+    outNormal *= -sign(rd);
 
-//   return Point(ray.ro + ray.rd * d, box.color, outNormal, d);
-// }
+    vec3 hitCoord = ray.ro + ray.rd * d;
+    outNormal = (outNormal * box.normalMatrix).xyz;
+
+    return Point(hitCoord, box.color, outNormal, d);
+}
 
 Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
     Point p;
@@ -260,7 +268,7 @@ Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out
                 p = intersect_plan(obj, ray);
                 break;
             case Box:
-                // p = intersect_box(obj, ray);
+                p = intersect_box(obj, ray);
                 break;
         }
         if (p.dist < dist && p.dist > 0 && p.dist != 1.0 / 0.0) {
@@ -285,11 +293,15 @@ bool checkIfShadow(
 
 void main() {
     Object plan = createObject(
-        Plan,
-        0,
-        0,
-        TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
-        vec3(1, 1, 1));
+        Plan, 0, 0, TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)), vec3(1, 1, 1));
+
+    Object tower1 = createObject(
+        Box, 0, 0, TransformComponent(vec3(-5, 0, -5), vec3(2, 15, 2), vec3(0, 0, 0)),
+        vec3(0.2, 0.2, 0.2));
+    Object tower2 = createObject(
+        Box, 0, 0, TransformComponent(vec3(0, 0, 0), vec3(2, 15, 2), vec3(0, 0, 0)),
+        vec3(0.2, 0.2, 0.2));
+
     // Object sphere = createObject(
     //     Sphere,
     //     0,
@@ -297,53 +309,45 @@ void main() {
     //     TransformComponent(vec3(0, 0, 0), vec3(2, 40, 2), vec3(0, 0, 0)),
     //     vec3(1, 0, 0));
 
+    // plane made with sphere
 
-    //plane made with sphere
-
-    vec3 generalPosition = vec3(0*15, -45, 0);
+    vec3 generalPosition = vec3(7, -10, 0);
 
     Object mainPart = createObject(
-        Sphere,
-        0,
-        0,
+        Sphere, 0, 0,
         TransformComponent(vec3(0, 0, 0) + generalPosition, vec3(4, 1, 1), vec3(0, 0, 0)),
         vec3(0.2, 0.4, 0.4));
     Object rightWing = createObject(
-        Sphere,
-        0,
-        0,
-        TransformComponent(vec3(0, 0, -1.5) + generalPosition, vec3(1, 0.25, 2.2), vec3(0, -0.75, 0)),
+        Sphere, 0, 0,
+        TransformComponent(
+            vec3(0, 0, -1.5) + generalPosition, vec3(1, 0.25, 2.2), vec3(0, -0.75, 0)),
         vec3(0.2, 0.4, 0.4));
 
     Object leftWing = createObject(
-        Sphere,
-        0,
-        0,
+        Sphere, 0, 0,
         TransformComponent(vec3(0, 0, 1.5) + generalPosition, vec3(1, 0.25, 2.2), vec3(0, 0.75, 0)),
         vec3(0.2, 0.4, 0.4));
 
     Object horizontalStab = createObject(
-        Sphere,
-        0,
-        0,
+        Sphere, 0, 0,
         TransformComponent(vec3(3.3, 0, 0) + generalPosition, vec3(0.5, 0.1, 2), vec3(0, 0., 0)),
         vec3(0.2, 0.4, 0.4));
-    
+
     Object verticalStab = createObject(
-        Sphere,
-        0,
-        0,
+        Sphere, 0, 0,
         TransformComponent(vec3(4, -.6, 0) + generalPosition, vec3(0.35, 1, 0.1), vec3(0, 0., 0.5)),
         vec3(0.2, 0.4, 0.4));
 
     Object objects[100];
     objects[0] = plan;
 
-    objects[3] = mainPart;
-    objects[4] = rightWing;
-    objects[5] = leftWing;
-    objects[6] = horizontalStab;
-    objects[7] = verticalStab;
+    objects[1] = mainPart;
+    objects[2] = rightWing;
+    objects[3] = leftWing;
+    objects[4] = horizontalStab;
+    objects[5] = verticalStab;
+    objects[6] = tower1;
+    objects[7] = tower2;
     uint nbOfObjects = 8;
 
     // create variable
