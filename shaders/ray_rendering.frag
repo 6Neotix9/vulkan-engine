@@ -7,17 +7,18 @@ const uint SUB = 0x00000004u;
 const uint Sphere = 0x00000005u;
 const uint Plan = 0x00000006u;
 const uint Box = 0x00000007u;
+const uint Cylinder = 0x00000008u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 8;
-const uint DOM_LIGHT = 4;
+const uint ANTI_ALIASING_FACTOR = 32;
+const uint DOM_LIGHT = 2;
 
 layout(location = 0) in vec2 fragOffset;
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outColor2;
 
-struct PointLight {
+struct HitPointLight {
     vec4 position;  // ignore w
     vec4 color;     // w is intensity
 };
@@ -27,7 +28,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 view;
     mat4 invView;
     vec4 ambientLightColor;  // w is intensity
-    PointLight pointLights[10];
+    HitPointLight HitPointLights[10];
     int numLights;
     float frameTime;
 }
@@ -61,7 +62,9 @@ struct Ray {
     vec3 rd;
 };
 
-struct Point {
+vec3 Point(Ray ray, float t) { return ray.ro + t * ray.rd; }
+
+struct HitPoint {
     vec3 pos;
     vec3 color;
     vec3 normal;
@@ -93,22 +96,32 @@ float random(inout uint seed) {
     return floatConstruct(x);
 }
 
+float distanceToZBufferValue(float dist, float near, float far) {
+    // Convert distance from world space to normalized device coordinates (NDC)
+    float z_n = ((2*0.1*100/dist) - 100 - 0.1) / (100 - 0.1);
+
+    // Convert from NDC to z-buffer range (0 to 1)
+    float z_buffer_value = (z_n + 1.0) / 2.0;
+
+    return 1-z_buffer_value;
+}
+
 Ray createRay(in vec2 px) {
     // convert pixel to NDS
     vec2 pxNDS = (px / (push.resolution)) * 2. - 1.;
 
-    // choose an arbitrary point in the viewing volume
-    // z = -1 equals a point on the near plane, i.e. the screen
-    vec3 pointNDS = vec3(pxNDS, 0.1);
+    // choose an arbitrary HitPoint in the viewing volume
+    // z = -1 equals a HitPoint on the near plane, i.e. the screen
+    vec3 HitPointNDS = vec3(pxNDS, 0.1);
 
     // as this is in homogenous space, add the last homogenous coordinate
-    vec4 pointNDSH = vec4(pointNDS, 1.0);
-    // transform by inverse projection to get the point in view space
-    vec4 dirEye = inverse(ubo.projection) * pointNDSH;
+    vec4 HitPointNDSH = vec4(HitPointNDS, 1.0);
+    // transform by inverse projection to get the HitPoint in view space
+    vec4 dirEye = inverse(ubo.projection) * HitPointNDSH;
 
     // since the camera is at the origin in view space by definition,
-    // the current point is already the correct direction
-    // (dir(0,P) = P - 0 = P as a direction, an infinite point,
+    // the current HitPoint is already the correct direction
+    // (dir(0,P) = P - 0 = P as a direction, an infinite HitPoint,
     // the homogenous component becomes 0 the scaling done by the
     // w-division is not of interest, as the direction in xyz will
     // stay the same and we can just normalize it later
@@ -119,10 +132,24 @@ Ray createRay(in vec2 px) {
     return Ray(ro, rd);
 }
 
-Ray Bendray(in Ray r, in float bendAngle ){
-    float bendSign = bendAngle < 0 ? -1 : 1;
-    
-    return r;
+vec3 Bend(in vec3 HitPoint) {
+    vec3 outHitPoint;
+    // outHitPoint.x = HitPoint.x * cos(HitPoint.z);
+    // outHitPoint.y = HitPoint.y;
+    // outHitPoint.z = HitPoint.x * sin(HitPoint.z);
+    outHitPoint.x = sqrt(HitPoint.x * HitPoint.x + HitPoint.y * HitPoint.y);
+    if (HitPoint.x > 0) {
+        outHitPoint.y = atan(HitPoint.y / HitPoint.x);
+    } else if (HitPoint.x == 0 && HitPoint.y > 0) {
+        outHitPoint.y = PI / 2;
+    } else if (HitPoint.x == 0 && HitPoint.y < 0) {
+        outHitPoint.y = 3 * PI / 2;
+    } else {
+        outHitPoint.y = PI + atan(HitPoint.y / HitPoint.x);
+    }
+    outHitPoint.z = HitPoint.z;
+
+    return outHitPoint;
 }
 
 mat4 createModelMatrix(in TransformComponent t) {
@@ -170,7 +197,7 @@ Object createObject(
     return Object(type, objectL, objectR, modelMatrix, normalMatrix, color);
 }
 
-Point intersect_sphere(in Object s, in Ray ray) {
+HitPoint intersect_sphere(in Object s, in Ray ray) {
     vec3 ro = (vec4(ray.ro, 1.0) * inverse(s.modelMatrix)).xyz;
     vec3 rd = (vec4(ray.rd, .0) * inverse(s.modelMatrix)).xyz;
     vec3 pos = {s.modelMatrix[0].w, s.modelMatrix[1].w, s.modelMatrix[2].w};
@@ -194,10 +221,10 @@ Point intersect_sphere(in Object s, in Ray ray) {
     vec3 hitCoord = ray.ro + ray.rd * d;
     vec3 normal = normalize((ro + rd * d));
     normal = (normal * s.normalMatrix).xyz;
-    return Point(hitCoord, s.color, normal, d);
+    return HitPoint(hitCoord, s.color, normal, d);
 }
 
-Point intersect_plan(in Object plan, in Ray ray) {
+HitPoint intersect_plan(in Object plan, in Ray ray) {
     vec3 ro = (vec4(ray.ro, 1.0) * inverse(plan.modelMatrix)).xyz;
     vec3 rd = (vec4(ray.rd, 0.0) * inverse(plan.modelMatrix)).xyz;
 
@@ -215,24 +242,24 @@ Point intersect_plan(in Object plan, in Ray ray) {
         color = vec3(0., 0., 0.);
     }
 
-    return Point(hitCoord, plan.color, normal, d);
+    return HitPoint(hitCoord, plan.color, normal, d);
 }
 
 // Source : Inigo Quilez sur shaderToy
-Point intersect_box(in Object box, in Ray ray) {
+HitPoint intersect_box(in Object box, in Ray ray) {
     vec3 ro = (vec4(ray.ro, 1.0) * inverse(box.modelMatrix)).xyz;
     vec3 rd = (vec4(ray.rd, 0.0) * inverse(box.modelMatrix)).xyz;
     float d = 1.0 / 0.0;
     vec3 m = 1.0 / rd;  // can precompute if traversing a set of aligned boxes
-    vec3 n = m * ro;        // can precompute if traversing a set of aligned boxes
+    vec3 n = m * ro;    // can precompute if traversing a set of aligned boxes
     vec3 k = abs(m);
     vec3 t1 = -n - k;
     vec3 t2 = -n + k;
     float tN = max(max(t1.x, t1.y), t1.z);
     float tF = min(min(t2.x, t2.y), t2.z);
     if (tN > tF || tF < 0.0) {
-        return Point(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0),
-                     1.0 / 0.0);  // no intersection
+        return HitPoint(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0),
+                        1.0 / 0.0);  // no intersection
     }
 
     if (tN < tF && tN > 0) {
@@ -249,12 +276,63 @@ Point intersect_box(in Object box, in Ray ray) {
     vec3 hitCoord = ray.ro + ray.rd * d;
     outNormal = (outNormal * box.normalMatrix).xyz;
 
-    return Point(hitCoord, box.color, outNormal, d);
+    return HitPoint(hitCoord, box.color, outNormal, d);
 }
 
-Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
-    Point p;
-    Point finalP;
+// Source : robertcupisz - https://www.shadertoy.com/view/4s23DR
+HitPoint interest_cylinder2(in Object cyl, in Ray ray) {
+    vec3 ro = (vec4(ray.ro, 1.0) * inverse(cyl.modelMatrix)).xyz;
+    vec3 rd = (vec4(ray.rd, 0.0) * inverse(cyl.modelMatrix)).xyz;
+    vec3 pos = vec3(0, 0, 0);
+    HitPoint res = HitPoint(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 1.0 / 0.0);
+    res.color = cyl.color;
+    float radius = 0.2;
+    float height = 1.0;
+
+    vec2 g = ro.xy - pos.xy;
+
+    //<g + t*v.d, g + t*v.d> = r^2
+    //<g,g> - r^2 + 2*t*<g,v.d> + t^2 <v.d,v.d> = 0
+
+    float a = dot(rd.xy, rd.xy);
+    float b = 2.0 * dot(g.xy, rd.xy);
+    float c = dot(g.xy, g.xy) - radius;
+
+    float disc = b * b - 4.0 * a * c;
+    if (disc < 0.0) return res;
+
+    float d = sqrt(disc);
+    float t0 = (-b - d) / (2.0 * a);
+    float t1 = (-b + d) / (2.0 * a);
+
+    float rcp = 1.0 / rd.z;
+    float aa = rcp * (pos - ro).z;
+    float ta = aa - abs(rcp) * height;
+    float tb = aa + abs(rcp) * height;
+
+    // cylinder is between near and far cap
+    if (ta <= t0 && t0 <= tb) {
+        vec2 w = g + t0 * rd.xy;
+        res.normal = (normalize(vec3(w, 0)) * cyl.normalMatrix).xyz;
+        res.pos = ray.ro + t0 * ray.rd;
+        res.dist = t0;
+        return res;
+    }
+
+    // near cap is inside infinite cylinder
+    if (t0 < ta && ta < t1) {
+        res.normal = (vec3(0, 0, -sign(rd.z)) * cyl.normalMatrix).xyz;
+        res.pos = ray.ro + ta * ray.rd;
+        res.dist = ta;
+        return res;
+    }
+
+    return res;
+}
+
+HitPoint intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
+    HitPoint p;
+    HitPoint finalP;
     Object obj;
     float dist = 1.0 / 0.0;
 
@@ -270,6 +348,9 @@ Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out
             case Box:
                 p = intersect_box(obj, ray);
                 break;
+            case Cylinder:
+                p = interest_cylinder2(obj, ray);
+                break;
         }
         if (p.dist < dist && p.dist > 0 && p.dist != 1.0 / 0.0) {
             dist = p.dist;
@@ -281,10 +362,10 @@ Point intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out
 }
 
 bool checkIfShadow(
-    in vec3 sunDir, in Point hitPoint, in Object[100] objects, in uint numberOfobjects) {
+    in vec3 sunDir, in HitPoint hitHitPoint, in Object[100] objects, in uint numberOfobjects) {
     float d;
-    Ray r = Ray(hitPoint.pos, sunDir);
-    Point p = intersect(r, objects, numberOfobjects, d);
+    Ray r = Ray(hitHitPoint.pos, sunDir);
+    HitPoint p = intersect(r, objects, numberOfobjects, d);
     if (d < 0 || d == 1.0 / 0.0)
         return false;
     else
@@ -296,59 +377,29 @@ void main() {
         Plan, 0, 0, TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)), vec3(1, 1, 1));
 
     Object tower1 = createObject(
-        Box, 0, 0, TransformComponent(vec3(-5, 0, -5), vec3(2, 15, 2), vec3(0, 0, 0)),
-        vec3(0.2, 0.2, 0.2));
+        Cylinder, 0, 0,
+        TransformComponent(vec3(0, -5, 0), vec3(2, 2, 5), vec3(1.570796326795, 0, 0)),
+        vec3(2, 2, 2));
     Object tower2 = createObject(
-        Box, 0, 0, TransformComponent(vec3(0, 0, 0), vec3(2, 15, 2), vec3(0, 0, 0)),
-        vec3(0.2, 0.2, 0.2));
+        Cylinder, 0, 0,
+        TransformComponent(vec3(0, -10.25, 0), vec3(2, 2, 0.1), vec3(1.570796326795, 0, 0)),
+        vec3(2, 2, 2));
 
-    // Object sphere = createObject(
-    //     Sphere,
-    //     0,
-    //     0,
-    //     TransformComponent(vec3(0, 0, 0), vec3(2, 40, 2), vec3(0, 0, 0)),
-    //     vec3(1, 0, 0));
+    Object block1 = createObject(
+        Box, 0, 0, TransformComponent(vec3(-7, 0, 0), vec3(2, 2, 2), vec3(0, 0, 0)),
+        vec3(0.05, 0.2, 1));
 
-    // plane made with sphere
-
-    vec3 generalPosition = vec3(7, -10, 0);
-
-    Object mainPart = createObject(
-        Sphere, 0, 0,
-        TransformComponent(vec3(0, 0, 0) + generalPosition, vec3(4, 1, 1), vec3(0, 0, 0)),
-        vec3(0.2, 0.4, 0.4));
-    Object rightWing = createObject(
-        Sphere, 0, 0,
-        TransformComponent(
-            vec3(0, 0, -1.5) + generalPosition, vec3(1, 0.25, 2.2), vec3(0, -0.75, 0)),
-        vec3(0.2, 0.4, 0.4));
-
-    Object leftWing = createObject(
-        Sphere, 0, 0,
-        TransformComponent(vec3(0, 0, 1.5) + generalPosition, vec3(1, 0.25, 2.2), vec3(0, 0.75, 0)),
-        vec3(0.2, 0.4, 0.4));
-
-    Object horizontalStab = createObject(
-        Sphere, 0, 0,
-        TransformComponent(vec3(3.3, 0, 0) + generalPosition, vec3(0.5, 0.1, 2), vec3(0, 0., 0)),
-        vec3(0.2, 0.4, 0.4));
-
-    Object verticalStab = createObject(
-        Sphere, 0, 0,
-        TransformComponent(vec3(4, -.6, 0) + generalPosition, vec3(0.35, 1, 0.1), vec3(0, 0., 0.5)),
-        vec3(0.2, 0.4, 0.4));
+    Object block2 = createObject(
+        Box, 0, 0, TransformComponent(vec3(-9, 0.25, -2), vec3(3, 2, 2), vec3(0, 0, 0)),
+        vec3(0.05, 0.2, 1));
 
     Object objects[100];
     objects[0] = plan;
-
-    objects[1] = mainPart;
-    objects[2] = rightWing;
-    objects[3] = leftWing;
-    objects[4] = horizontalStab;
-    objects[5] = verticalStab;
-    objects[6] = tower1;
-    objects[7] = tower2;
-    uint nbOfObjects = 8;
+    objects[1] = tower1;
+    objects[2] = tower2;
+    objects[3] = block1;
+    objects[4] = block2;
+    uint nbOfObjects = 5;
 
     // create variable
 
@@ -362,6 +413,8 @@ void main() {
     vec3 sunDir = normalize(vec3(0.5, -1, -0.5));
     vec3 sunColor = vec3(1, 1, 1);
     vec3 ImageColor = {0, 0, 0};
+    float depthDist = 0;
+
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
         vec2 randomRayDir = vec2(random(rseed), random(rseed));
 
@@ -369,11 +422,12 @@ void main() {
 
         // intersect
 
-        Point finalP = intersect(ray, objects, nbOfObjects, dist);
+        HitPoint finalP = intersect(ray, objects, nbOfObjects, dist);
         if (!(dist == 1.0 / 0.0 || dist < 0)) {
-            color = finalP.color * (max(0, dot(normalize(finalP.normal), normalize(sunDir)))) *
-                    sunColor;
+            color = finalP.color
+                    * (max(0, dot(normalize(finalP.normal), normalize(sunDir)))) * sunColor;
             finalP.pos = finalP.pos + 0.001 * finalP.normal;
+            depthDist += dist;
             if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
                 color = color * 0.;
             }
@@ -402,12 +456,14 @@ void main() {
             ImageColor += color;
         } else {
             ImageColor += vec3(0.502, 0.869, 1);
+            depthDist = 1.0 / 0.0;
         }
     }
 
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
-    finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
 
+    finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
+    gl_FragDepth = distanceToZBufferValue(depthDist / ANTI_ALIASING_FACTOR, 0.1, 100.0);
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
     // outColor = vec4(random(rseed), random(rseed), random(rseed), 1);
