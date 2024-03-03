@@ -30,12 +30,12 @@ struct ResolutionPushConstant {
 RayRenderingSystem::RayRenderingSystem(
     LveDevice& device,
     std::shared_ptr<LvePipelineRessources> pipelineRessources,
-    VkDescriptorSetLayout globalSetLayout)
+    VkDescriptorSetLayout globalSetLayout, std::shared_ptr<LveImage> BRDF_LUTImage)
     : LveASystem(
           device,
           "ray_rendering",
-          pipelineRessources,
-          std::vector<VkDescriptorSetLayout>{globalSetLayout}) {
+          pipelineRessources
+          ), BRDF_LUTImage(BRDF_LUTImage) {
     createRandomImage();
     createDescriptorSet();
     createPipelineLayout(std::vector<VkDescriptorSetLayout>{
@@ -80,14 +80,15 @@ void RayRenderingSystem::createPipeline() {
     pipelineConfig.pipelineLayout = pipelineLayout;
     lvePipeline = std::make_unique<LvePipeline>(
         lveDevice,
-        "shaders/ray_rendering.vert.spv",
-        "shaders/ray_rendering.frag.spv",
+        "shaders/compiled/ray_rendering.vert.spv",
+        "shaders/compiled/ray_rendering.frag.spv",
         pipelineConfig);
 }
 
 void RayRenderingSystem::createDescriptorSet() {
     randomImageDescriptorPool = LveDescriptorPool::Builder(lveDevice)
                                     .setMaxSets(1 + LveSwapChain::MAX_FRAMES_IN_FLIGHT)
+                                    .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
                                     .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
                                     .addPoolSize(
                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -96,6 +97,7 @@ void RayRenderingSystem::createDescriptorSet() {
     randomImageDescriptorLayout =
         LveDescriptorSetLayout::Builder(lveDevice)
             .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_ALL_GRAPHICS)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_ALL_GRAPHICS)
             .build();
 
     previousImageDescriptorLayout =
@@ -107,9 +109,20 @@ void RayRenderingSystem::createDescriptorSet() {
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = randomImage->getVkImageView();
     imageInfo.sampler = randomImage->getVkSampler();
+
+     VkDescriptorImageInfo brdfimageInfo{};
+    brdfimageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    brdfimageInfo.imageView = BRDF_LUTImage->getVkImageView();
+    brdfimageInfo.sampler = BRDF_LUTImage->getVkSampler();
+
+
+
     LveDescriptorWriter(*randomImageDescriptorLayout, *randomImageDescriptorPool)
         .writeImage(0, &imageInfo)
+        .writeImage(1, &brdfimageInfo)
         .build(randomImageDescriptorSet);
+
+
 
     previousImageDescriptorSets.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
     previousImages.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);

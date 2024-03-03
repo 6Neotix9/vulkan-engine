@@ -27,7 +27,7 @@ struct SimplePushConstantData {
 
 SimpleRenderSystem::SimpleRenderSystem(
     LveDevice& device, std::shared_ptr<LvePipelineRessources> pipelineRessources, VkDescriptorSetLayout globalSetLayout)
-    : LveASystem(device, "simple_shader", pipelineRessources, std::vector<VkDescriptorSetLayout>{globalSetLayout}) {
+    : LveASystem(device, "simple_shader", pipelineRessources) {
     createPipelineLayout(std::vector<VkDescriptorSetLayout>{globalSetLayout});
     createPipeline();
 }
@@ -67,8 +67,8 @@ void SimpleRenderSystem::createPipeline() {
     pipelineConfig.pipelineLayout = pipelineLayout;
     lvePipeline = std::make_unique<LvePipeline>(
         lveDevice,
-        "shaders/simple_shader.vert.spv",
-        "shaders/simple_shader.frag.spv",
+        "shaders/compiled/simple_shader.vert.spv",
+        "shaders/compiled/simple_shader.frag.spv",
         pipelineConfig);
 }
 

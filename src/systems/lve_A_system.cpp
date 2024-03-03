@@ -11,8 +11,8 @@ namespace lve {
 LveASystem::LveASystem(
     LveDevice &lveDevice,
     const char *shaderName,
-    std::shared_ptr<LvePipelineRessources> pipelineRessources,
-    std::vector<VkDescriptorSetLayout> descriptorSetLayouts)
+    std::shared_ptr<LvePipelineRessources> pipelineRessources
+    )
     : lveDevice{lveDevice}, pipelineRessources{pipelineRessources} {
     
     LveHotReload::getInstance()->addShader(shaderName, this);

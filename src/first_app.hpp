@@ -3,6 +3,7 @@
 #include "lve_descriptors.hpp"
 #include "lve_device.hpp"
 #include "lve_game_object.hpp"
+#include "lve_image.hpp"
 #include "lve_renderer.hpp"
 #include "lve_window.hpp"
 
@@ -22,8 +23,10 @@ class FirstApp {
 
     FirstApp(const FirstApp &) = delete;
     FirstApp &operator=(const FirstApp &) = delete;
-
+    void init();
     void run();
+    
+
 
    private:
     
@@ -34,6 +37,7 @@ class FirstApp {
     LveWindow lveWindow{WIDTH, HEIGHT, "Vulkan Tutorial"};
     LveDevice lveDevice{lveWindow};
     LveRenderer lveRenderer{lveWindow, &lveDevice};
+    std::shared_ptr<LveImage> BRDF_LUTImage;
     
     // note: order of declarations matters
     std::unique_ptr<LveDescriptorPool> globalPool{};

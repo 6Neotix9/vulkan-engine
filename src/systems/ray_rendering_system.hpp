@@ -17,7 +17,7 @@ class RayRenderingSystem : public LveASystem {
     RayRenderingSystem(
         LveDevice &device,
         std::shared_ptr<LvePipelineRessources> renderPass,
-        VkDescriptorSetLayout globalSetLayout);
+        VkDescriptorSetLayout globalSetLayout, std::shared_ptr<LveImage> BRDF_LUTImage);
     ~RayRenderingSystem();
 
     RayRenderingSystem(const RayRenderingSystem &) = delete;
@@ -26,11 +26,13 @@ class RayRenderingSystem : public LveASystem {
     void update(FrameInfo &frameInfo, GlobalUbo &ubo);
     void render(FrameInfo &frameInfo);
     std::shared_ptr<LveImage> getPreviousImage(uint i) const {return previousImages[i];}
+    
    private:
     void createRandomImage();
     void createDescriptorSet();
     void createPipelineLayout(std::vector<VkDescriptorSetLayout> globalSetLayout) override;
     void createPipeline() override;
+
     std::vector<std::shared_ptr<LveImage>> previousImages;
     std::unique_ptr<LveDescriptorPool> randomImageDescriptorPool;
     std::unique_ptr<LveDescriptorSetLayout> randomImageDescriptorLayout;
@@ -39,6 +41,7 @@ class RayRenderingSystem : public LveASystem {
     std::vector<VkDescriptorSet> previousImageDescriptorSets;
     
 
+    std::shared_ptr<LveImage> BRDF_LUTImage;
     std::unique_ptr<LveImage> randomImage;
 };
 }  // namespace lve

@@ -24,7 +24,7 @@ struct PointLightPushConstants {
 
 PointLightSystem::PointLightSystem(
     LveDevice& device, std::shared_ptr<LvePipelineRessources> pipelineRessources, VkDescriptorSetLayout globalSetLayout)
-    : LveASystem(device, "point_light", pipelineRessources, std::vector<VkDescriptorSetLayout>{globalSetLayout}){
+    : LveASystem(device, "point_light", pipelineRessources){
     createPipelineLayout(std::vector<VkDescriptorSetLayout>{globalSetLayout});
     createPipeline();
 }
@@ -67,8 +67,8 @@ void PointLightSystem::createPipeline() {
     pipelineConfig.pipelineLayout = pipelineLayout;
     lvePipeline = std::make_unique<LvePipeline>(
         lveDevice,
-        "shaders/point_light.vert.spv",
-        "shaders/point_light.frag.spv",
+        "shaders/compiled/point_light.vert.spv",
+        "shaders/compiled/point_light.frag.spv",
         pipelineConfig);
 }
 

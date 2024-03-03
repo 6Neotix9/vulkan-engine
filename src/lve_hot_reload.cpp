@@ -1,6 +1,7 @@
 #include "lve_hot_reload.hpp"
 
 #include <iostream>
+
 #include "systems/lve_A_system.hpp"
 
 namespace lve {
@@ -31,21 +32,18 @@ LveHotReload* LveHotReload::getInstance() {
 
 LveHotReload::~LveHotReload() {
     uv_stop(&loop);
-   
 
     // Libérer les ressources
     uv_fs_event_stop(&fs_event);
     uv_loop_close(&loop);
-     uv_thread.join();  // Attendre la fin du thread
+    uv_thread.join();  // Attendre la fin du thread
 }
 
 void LveHotReload::addShader(std::string name, LveASystem* shader) {
     shaderMap.insert({name, shader});
 }
 
-void LveHotReload::reloadShaders(std::string name) { 
-    shaderMap[name]->reloadShaders(); 
-    }
+void LveHotReload::reloadShaders(std::string name) { shaderMap[name]->reloadShaders(); }
 
 inline bool ends_with(std::string const& value, std::string const& ending) {
     if (ending.size() > value.size()) return false;
@@ -59,19 +57,14 @@ void LveHotReload::on_file_change(
         if (ends_with(filenameStr, ".vert") || ends_with(filenameStr, ".frag") ||
             ends_with(filenameStr, ".comp")) {
             // create command to compile shader
-            std::string command =
-                "glslc ../shaders/" + filenameStr + " -o ../shaders/" + filenameStr + ".spv";
+            std::string command = "glslc ../shaders/" + filenameStr + " -o ../shaders/compiled/" +
+                                  filenameStr + ".spv";
             system(command.c_str());
-        }
-        else if (ends_with(filenameStr, ".spv")) {
-            // get shader name from filename
             std::string shaderName = filenameStr.substr(
-                0,
-                filenameStr.substr(0, filenameStr.find_last_of(".")).find_last_of("."));
+                0, filenameStr.find_first_of("."));
             std::cout << "Reloading shader: " << shaderName << std::endl;
             reloadShaders(shaderName);
         }
-
     } else {
         fprintf(stderr, "Erreur lors de la surveillance du fichier: %s\n", uv_strerror(status));
     }

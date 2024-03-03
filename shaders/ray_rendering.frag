@@ -1,5 +1,9 @@
 #version 450
 
+////////////////////////////////////////////////////////
+//// Constant Variable /////////////////////////////////
+////////////////////////////////////////////////////////
+
 const uint XOR = 0x00000001u;
 const uint UNION = 0x00000002u;
 const uint INTER = 0x00000003u;
@@ -11,17 +15,59 @@ const uint Cylinder = 0x00000008u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 32;
-const uint DOM_LIGHT = 2;
+const uint ANTI_ALIASING_FACTOR = 25;
+const uint DOM_LIGHT = 0;
 
-layout(location = 0) in vec2 fragOffset;
-layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec4 outColor2;
+////////////////////////////////////////////////////////
+//// Struct ////////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 struct HitPointLight {
     vec4 position;  // ignore w
     vec4 color;     // w is intensity
 };
+
+struct TransformComponent {
+    vec3 translation;
+    vec3 scale;
+    vec3 rotation;
+};
+
+struct Material {
+    vec3 albedo;
+    float metallic;
+    float roughness;
+};
+
+struct Object {
+    uint type;
+    uint objectL;
+    uint objectR;
+    mat4 modelMatrix;
+    mat3 normalMatrix;
+    Material material;
+    // vec3 size;
+};
+
+struct Ray {
+    vec3 ro;
+    vec3 rd;
+};
+
+struct HitPoint {
+    vec3 pos;
+    Material material;
+    vec3 normal;
+    float dist;
+};
+
+////////////////////////////////////////////////////////
+//// Ressource Layout //////////////////////////////////
+////////////////////////////////////////////////////////
+
+layout(location = 0) in vec2 fragOffset;
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outColor2;
 
 layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 projection;
@@ -36,44 +82,16 @@ ubo;
 
 layout(set = 0, binding = 1) uniform sampler2D image;
 layout(set = 1, binding = 0) uniform sampler2D randomImage;
+layout(set = 1, binding = 1) uniform sampler2D BRDFLUT;
 layout(set = 2, binding = 0) uniform sampler2D previousImage;
 
 layout(push_constant) uniform Push { vec2 resolution; }
 push;
 
-struct TransformComponent {
-    vec3 translation;
-    vec3 scale;
-    vec3 rotation;
-};
+////////////////////////////////////////////////////////
+//// Utils Function ////////////////////////////////////
+////////////////////////////////////////////////////////
 
-struct Object {
-    uint type;
-    uint objectL;
-    uint objectR;
-    mat4 modelMatrix;
-    mat3 normalMatrix;
-    vec3 color;
-    // vec3 size;
-};
-
-struct Ray {
-    vec3 ro;
-    vec3 rd;
-};
-
-vec3 Point(Ray ray, float t) { return ray.ro + t * ray.rd; }
-
-struct HitPoint {
-    vec3 pos;
-    vec3 color;
-    vec3 normal;
-    float dist;
-};
-
-// Construct a float with half-open range [0:1] using low 23 bits.
-// All zeroes yields 0.0, all ones yields the next smallest representable value
-// below 1.0.
 float floatConstruct(uint m) {
     const uint ieeeMantissa = 0x007FFFFFu;  // binary32 mantissa bitmask
     const uint ieeeOne = 0x3F800000u;       // 1.0 in IEEE binary32
@@ -98,13 +116,20 @@ float random(inout uint seed) {
 
 float distanceToZBufferValue(float dist, float near, float far) {
     // Convert distance from world space to normalized device coordinates (NDC)
-    float z_n = ((2*0.1*100/dist) - 100 - 0.1) / (100 - 0.1);
+    dist = min(99, dist);
+    float z_n = ((2 * 0.1 * 100 / dist) - 100 - 0.1) / (100 - 0.1);
 
     // Convert from NDC to z-buffer range (0 to 1)
     float z_buffer_value = (z_n + 1.0) / 2.0;
 
-    return 1-z_buffer_value;
+    return 1 - z_buffer_value;
 }
+
+vec3 Point(Ray ray, float t) { return ray.ro + t * ray.rd; }
+
+////////////////////////////////////////////////////////
+//// Creation Function /////////////////////////////////
+////////////////////////////////////////////////////////
 
 Ray createRay(in vec2 px) {
     // convert pixel to NDS
@@ -130,26 +155,6 @@ Ray createRay(in vec2 px) {
     // compute world ray direction by multiplying the inverse view matrix
     vec3 rd = (ubo.invView * dirEye).xyz;
     return Ray(ro, rd);
-}
-
-vec3 Bend(in vec3 HitPoint) {
-    vec3 outHitPoint;
-    // outHitPoint.x = HitPoint.x * cos(HitPoint.z);
-    // outHitPoint.y = HitPoint.y;
-    // outHitPoint.z = HitPoint.x * sin(HitPoint.z);
-    outHitPoint.x = sqrt(HitPoint.x * HitPoint.x + HitPoint.y * HitPoint.y);
-    if (HitPoint.x > 0) {
-        outHitPoint.y = atan(HitPoint.y / HitPoint.x);
-    } else if (HitPoint.x == 0 && HitPoint.y > 0) {
-        outHitPoint.y = PI / 2;
-    } else if (HitPoint.x == 0 && HitPoint.y < 0) {
-        outHitPoint.y = 3 * PI / 2;
-    } else {
-        outHitPoint.y = PI + atan(HitPoint.y / HitPoint.x);
-    }
-    outHitPoint.z = HitPoint.z;
-
-    return outHitPoint;
 }
 
 mat4 createModelMatrix(in TransformComponent t) {
@@ -197,6 +202,10 @@ Object createObject(
     return Object(type, objectL, objectR, modelMatrix, normalMatrix, color);
 }
 
+////////////////////////////////////////////////////////
+//// Intersection Function /////////////////////////////
+////////////////////////////////////////////////////////
+
 HitPoint intersect_sphere(in Object s, in Ray ray) {
     vec3 ro = (vec4(ray.ro, 1.0) * inverse(s.modelMatrix)).xyz;
     vec3 rd = (vec4(ray.rd, .0) * inverse(s.modelMatrix)).xyz;
@@ -220,7 +229,7 @@ HitPoint intersect_sphere(in Object s, in Ray ray) {
     }
     vec3 hitCoord = ray.ro + ray.rd * d;
     vec3 normal = normalize((ro + rd * d));
-    normal = (normal * s.normalMatrix).xyz;
+    normal = normalize((normal * s.normalMatrix).xyz);
     return HitPoint(hitCoord, s.color, normal, d);
 }
 
@@ -242,10 +251,10 @@ HitPoint intersect_plan(in Object plan, in Ray ray) {
         color = vec3(0., 0., 0.);
     }
 
-    return HitPoint(hitCoord, plan.color, normal, d);
+    return HitPoint(hitCoord, plan.color, normalize(normal), d);
 }
 
-// Source : Inigo Quilez sur shaderToy
+// Source : Inigo Quilez - https://iquilezles.org/articles/intersectors/
 HitPoint intersect_box(in Object box, in Ray ray) {
     vec3 ro = (vec4(ray.ro, 1.0) * inverse(box.modelMatrix)).xyz;
     vec3 rd = (vec4(ray.rd, 0.0) * inverse(box.modelMatrix)).xyz;
@@ -274,12 +283,12 @@ HitPoint intersect_box(in Object box, in Ray ray) {
     outNormal *= -sign(rd);
 
     vec3 hitCoord = ray.ro + ray.rd * d;
-    outNormal = (outNormal * box.normalMatrix).xyz;
+    outNormal = normalize((outNormal * box.normalMatrix).xyz);
 
     return HitPoint(hitCoord, box.color, outNormal, d);
 }
 
-// Source : robertcupisz - https://www.shadertoy.com/view/4s23DR
+// Source : cdyk - https://www.shadertoy.com/view/ttXSzl
 HitPoint interest_cylinder2(in Object cyl, in Ray ray) {
     vec3 ro = (vec4(ray.ro, 1.0) * inverse(cyl.modelMatrix)).xyz;
     vec3 rd = (vec4(ray.rd, 0.0) * inverse(cyl.modelMatrix)).xyz;
@@ -313,7 +322,7 @@ HitPoint interest_cylinder2(in Object cyl, in Ray ray) {
     // cylinder is between near and far cap
     if (ta <= t0 && t0 <= tb) {
         vec2 w = g + t0 * rd.xy;
-        res.normal = (normalize(vec3(w, 0)) * cyl.normalMatrix).xyz;
+        res.normal = normalize((normalize(vec3(w, 0)) * cyl.normalMatrix).xyz);
         res.pos = ray.ro + t0 * ray.rd;
         res.dist = t0;
         return res;
@@ -321,7 +330,7 @@ HitPoint interest_cylinder2(in Object cyl, in Ray ray) {
 
     // near cap is inside infinite cylinder
     if (t0 < ta && ta < t1) {
-        res.normal = (vec3(0, 0, -sign(rd.z)) * cyl.normalMatrix).xyz;
+        res.normal = normalize((vec3(0, 0, -sign(rd.z)) * cyl.normalMatrix).xyz);
         res.pos = ray.ro + ta * ray.rd;
         res.dist = ta;
         return res;
@@ -329,6 +338,10 @@ HitPoint interest_cylinder2(in Object cyl, in Ray ray) {
 
     return res;
 }
+
+////////////////////////////////////////////////////////
+//// Launch Ray Function ///////////////////////////////
+////////////////////////////////////////////////////////
 
 HitPoint intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, out float d) {
     HitPoint p;
@@ -372,34 +385,91 @@ bool checkIfShadow(
         return true;
 }
 
+////////////////////////////////////////////////////////
+//// PBR Function (from learnopengl - vulkan exemples)//
+////////////////////////////////////////////////////////
+
+float distributionGGX(vec3 N, vec3 H, float roughness) {
+    float a2 = roughness * roughness * roughness * roughness;
+    float NdotH = max(dot(N, H), 0.0);
+    float denom = (NdotH * NdotH * (a2 - 1.0) + 1.0);
+    return a2 / (PI * denom * denom);
+}
+
+float geometrySchlickGGX(float NdotV, float roughness) {
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+    return geometrySchlickGGX(max(dot(N, L), 0.0), roughness) *
+           geometrySchlickGGX(max(dot(N, V), 0.0), roughness);
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0) { return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0); }
+
+// Specular BRDF composition --------------------------------------------
+
+vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughness, vec3 albedo) {
+    vec3 H = normalize(V + L);
+    vec3 F0 = mix(vec3(0.04), pow(albedo, vec3(2.2)), metallic);
+    float NDF = distributionGGX(N, H, roughness);
+    float G = geometrySmith(N, V, L, roughness);
+    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    vec3 kD = vec3(1.0) - F;
+    kD *= 1.0 - metallic;
+
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+    vec3 specular = numerator / max(denominator, 0.001);
+
+    float NdotL = max(dot(N, L), 0.0);
+    vec3 color = lightColor * (kD * pow(albedo, vec3(2.2)) / PI + specular) * (NdotL / 1);
+
+    return color;
+}
+
+////////////////////////////////////////////////////////
+//// Light /////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
+vec3 sunLight(
+    vec3 sunDir, Ray r, vec3 sunColor, HitPoint finalP, Object[100] objects, uint nbOfObjects) {
+    if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
+        return vec3(0);
+    } else {
+        return PBR(
+            sunDir, r.ro, finalP.normal, sunColor, finalP.material.metallic,
+            finalP.material.roughness, finalP.material.albedo);
+    }
+}
+
+vec3 pointLight() { return vec3(1, 1, 1); }
+
+vec3 skyLight() { return vec3(1, 1, 1); }
+
+////////////////////////////////////////////////////////
+//// Main Function /////////////////////////////////////
+////////////////////////////////////////////////////////
+
 void main() {
     Object plan = createObject(
         Plan, 0, 0, TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)), vec3(1, 1, 1));
 
-    Object tower1 = createObject(
-        Cylinder, 0, 0,
-        TransformComponent(vec3(0, -5, 0), vec3(2, 2, 5), vec3(1.570796326795, 0, 0)),
-        vec3(2, 2, 2));
-    Object tower2 = createObject(
-        Cylinder, 0, 0,
-        TransformComponent(vec3(0, -10.25, 0), vec3(2, 2, 0.1), vec3(1.570796326795, 0, 0)),
-        vec3(2, 2, 2));
-
     Object block1 = createObject(
-        Box, 0, 0, TransformComponent(vec3(-7, 0, 0), vec3(2, 2, 2), vec3(0, 0, 0)),
-        vec3(0.05, 0.2, 1));
+        Sphere, 0, 0, TransformComponent(vec3(-1.5, 0, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
+        vec3(1, 0, 0));
 
     Object block2 = createObject(
-        Box, 0, 0, TransformComponent(vec3(-9, 0.25, -2), vec3(3, 2, 2), vec3(0, 0, 0)),
+        Box, 0, 0, TransformComponent(vec3(1.5, 0, 0), vec3(1, 0.5, 1), vec3(0, 0, 0)),
         vec3(0.05, 0.2, 1));
 
     Object objects[100];
     objects[0] = plan;
-    objects[1] = tower1;
-    objects[2] = tower2;
-    objects[3] = block1;
-    objects[4] = block2;
-    uint nbOfObjects = 5;
+    objects[1] = block1;
+    objects[2] = block2;
+    uint nbOfObjects = 3;
 
     // create variable
 
@@ -415,6 +485,11 @@ void main() {
     vec3 ImageColor = {0, 0, 0};
     float depthDist = 0;
 
+    /////// TEST PBR
+    float metallic = 0.1;
+    float roughness = 0.9;
+    /////// END TEST PBRs
+
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
         vec2 randomRayDir = vec2(random(rseed), random(rseed));
 
@@ -424,14 +499,36 @@ void main() {
 
         HitPoint finalP = intersect(ray, objects, nbOfObjects, dist);
         if (!(dist == 1.0 / 0.0 || dist < 0)) {
-            color = finalP.color
-                    * (max(0, dot(normalize(finalP.normal), normalize(sunDir)))) * sunColor;
+            vec3 N = finalP.normal;
+            vec3 V = -ray.rd;
+
+            vec3 Lo = vec3(0.0);
+            Lo += PBR(sunDir, V, N, sunColor, metallic, roughness, finalP.color);
+
+            // for(int w = 0; w < ubo.numLights; w++) {
+            //     vec3 L = ubo.HitPointLights[w].position.xyz - finalP.pos;
+
+            //     L = normalize(L);
+
+            //     Lo += PBR(L, V, N,ubo.HitPointLights[w].color.xyz, metallic, roughness,
+            //     finalP.color);
+            // }
+
+            vec3 color = finalP.color * 0.02;
+            color += Lo;
+            color = pow(color, vec3(1.0f / 1.3));
+
             finalP.pos = finalP.pos + 0.001 * finalP.normal;
-            depthDist += dist;
-            if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
-                color = color * 0.;
-            }
+            // depthDist += dist;
+
+            // color = vec3(finalP.normal.x, -finalP.normal.y, finalP.normal.z)/10;
+
+            // if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
+            //     color = color * 0.;
+            // }
+
             if (DOM_LIGHT > 0) {
+                int raylaunched = 0;
                 vec3 lighDomeColor = vec3(0, 0, 0);
                 for (int j = 0; j < DOM_LIGHT; j++) {
                     vec2 randomNum = vec2(random(rseed), random(rseed));
@@ -442,15 +539,18 @@ void main() {
 
                     vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
                     if (dot(d, finalP.normal) > 0) {
+                        raylaunched++;
                         vec3 temp =
-                            finalP.color * (max(0, dot(normalize(finalP.normal), d))) * sunColor;
+                            PBR(normalize(d), V, N, sunColor, metallic, roughness, finalP.color);
                         if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
                             temp = color * 0.;
                         }
                         lighDomeColor += temp;
                     }
                 }
-                color = color * 0.5 + (lighDomeColor / float(DOM_LIGHT)) * 0.5;
+                lighDomeColor =
+                    (raylaunched > 0) ? lighDomeColor / float(raylaunched) : vec3(0, 0, 0);
+                color = color + lighDomeColor * 0.5;
             }
 
             ImageColor += color;
@@ -462,7 +562,7 @@ void main() {
 
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
 
-    finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
+    // finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
     gl_FragDepth = distanceToZBufferValue(depthDist / ANTI_ALIASING_FACTOR, 0.1, 100.0);
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
