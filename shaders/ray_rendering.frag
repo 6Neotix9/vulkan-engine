@@ -196,10 +196,10 @@ mat3 createNormalMatrix(in TransformComponent t) {
 }
 
 Object createObject(
-    in uint type, in uint objectL, in uint objectR, in TransformComponent t, in vec3 color) {
+    in uint type, in uint objectL, in uint objectR, in TransformComponent t, in Material material) {
     mat4 modelMatrix = createModelMatrix(t);
     mat3 normalMatrix = createNormalMatrix(t);
-    return Object(type, objectL, objectR, modelMatrix, normalMatrix, color);
+    return Object(type, objectL, objectR, modelMatrix, normalMatrix, material);
 }
 
 ////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ HitPoint intersect_sphere(in Object s, in Ray ray) {
     vec3 hitCoord = ray.ro + ray.rd * d;
     vec3 normal = normalize((ro + rd * d));
     normal = normalize((normal * s.normalMatrix).xyz);
-    return HitPoint(hitCoord, s.color, normal, d);
+    return HitPoint(hitCoord, s.material, normal, d);
 }
 
 HitPoint intersect_plan(in Object plan, in Ray ray) {
@@ -244,14 +244,14 @@ HitPoint intersect_plan(in Object plan, in Ray ray) {
     vec3 hitCoord = ray.ro + ray.rd * d;
     vec3 normal = vec3(0, -1, 0);
     vec2 hitCoord2d = mod(hitCoord.xz, 4.0);
-    vec3 color;
+    Material color;
     if ((hitCoord2d.x > 2 && hitCoord2d.y > 2) || (hitCoord2d.x < 2 && hitCoord2d.y < 2)) {
-        color = plan.color;
+        color = plan.material;
     } else {
-        color = vec3(0., 0., 0.);
+        color = plan.material;
     }
 
-    return HitPoint(hitCoord, plan.color, normalize(normal), d);
+    return HitPoint(hitCoord, plan.material, normalize(normal), d);
 }
 
 // Source : Inigo Quilez - https://iquilezles.org/articles/intersectors/
@@ -266,8 +266,9 @@ HitPoint intersect_box(in Object box, in Ray ray) {
     vec3 t2 = -n + k;
     float tN = max(max(t1.x, t1.y), t1.z);
     float tF = min(min(t2.x, t2.y), t2.z);
+    Material mat;
     if (tN > tF || tF < 0.0) {
-        return HitPoint(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0),
+        return HitPoint(vec3(0, 0, 0), mat, vec3(0, 0, 0),
                         1.0 / 0.0);  // no intersection
     }
 
@@ -285,7 +286,7 @@ HitPoint intersect_box(in Object box, in Ray ray) {
     vec3 hitCoord = ray.ro + ray.rd * d;
     outNormal = normalize((outNormal * box.normalMatrix).xyz);
 
-    return HitPoint(hitCoord, box.color, outNormal, d);
+    return HitPoint(hitCoord, box.material, outNormal, d);
 }
 
 // Source : cdyk - https://www.shadertoy.com/view/ttXSzl
@@ -293,8 +294,8 @@ HitPoint interest_cylinder2(in Object cyl, in Ray ray) {
     vec3 ro = (vec4(ray.ro, 1.0) * inverse(cyl.modelMatrix)).xyz;
     vec3 rd = (vec4(ray.rd, 0.0) * inverse(cyl.modelMatrix)).xyz;
     vec3 pos = vec3(0, 0, 0);
-    HitPoint res = HitPoint(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 1.0 / 0.0);
-    res.color = cyl.color;
+    Material mat;
+    HitPoint res = HitPoint(vec3(0, 0, 0), cyl.material, vec3(0, 0, 0), 1.0 / 0.0);
     float radius = 0.2;
     float height = 1.0;
 
@@ -386,7 +387,7 @@ bool checkIfShadow(
 }
 
 ////////////////////////////////////////////////////////
-//// PBR Function (from learnopengl - vulkan exemples)//
+//// PBR Function (from learnopengl) ///////////////////
 ////////////////////////////////////////////////////////
 
 float distributionGGX(vec3 N, vec3 H, float roughness) {
@@ -435,12 +436,14 @@ vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughnes
 ////////////////////////////////////////////////////////
 
 vec3 sunLight(
-    vec3 sunDir, Ray r, vec3 sunColor, HitPoint finalP, Object[100] objects, uint nbOfObjects) {
+    Ray r, vec3 sunDir, vec3 sunColor, HitPoint finalP, Object[100] objects, uint nbOfObjects) {
     if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
         return vec3(0);
     } else {
         return PBR(
-            sunDir, r.ro, finalP.normal, sunColor, finalP.material.metallic,
+
+
+            sunDir, -r.rd, finalP.normal, sunColor, finalP.material.metallic,
             finalP.material.roughness, finalP.material.albedo);
     }
 }
@@ -455,15 +458,16 @@ vec3 skyLight() { return vec3(1, 1, 1); }
 
 void main() {
     Object plan = createObject(
-        Plan, 0, 0, TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)), vec3(1, 1, 1));
+        Plan, 0, 0, TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
+        Material(vec3(1, 1, 1), 0.1, 0.1));
 
     Object block1 = createObject(
         Sphere, 0, 0, TransformComponent(vec3(-1.5, 0, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
-        vec3(1, 0, 0));
+        Material(pow(vec3(0.2, 1, 0.2),vec3(2.2)), 0.5, 0.5));
 
     Object block2 = createObject(
         Box, 0, 0, TransformComponent(vec3(1.5, 0, 0), vec3(1, 0.5, 1), vec3(0, 0, 0)),
-        vec3(0.05, 0.2, 1));
+        Material(vec3(0.1, 0.2, 1), 0.1, 1));
 
     Object objects[100];
     objects[0] = plan;
@@ -485,11 +489,6 @@ void main() {
     vec3 ImageColor = {0, 0, 0};
     float depthDist = 0;
 
-    /////// TEST PBR
-    float metallic = 0.1;
-    float roughness = 0.9;
-    /////// END TEST PBRs
-
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
         vec2 randomRayDir = vec2(random(rseed), random(rseed));
 
@@ -499,11 +498,10 @@ void main() {
 
         HitPoint finalP = intersect(ray, objects, nbOfObjects, dist);
         if (!(dist == 1.0 / 0.0 || dist < 0)) {
-            vec3 N = finalP.normal;
-            vec3 V = -ray.rd;
+            finalP.pos += 0.0001 * finalP.normal; 
 
             vec3 Lo = vec3(0.0);
-            Lo += PBR(sunDir, V, N, sunColor, metallic, roughness, finalP.color);
+            Lo += sunLight(ray, sunDir, sunColor, finalP, objects, nbOfObjects);
 
             // for(int w = 0; w < ubo.numLights; w++) {
             //     vec3 L = ubo.HitPointLights[w].position.xyz - finalP.pos;
@@ -514,9 +512,9 @@ void main() {
             //     finalP.color);
             // }
 
-            vec3 color = finalP.color * 0.02;
+            vec3 color = vec3(0);
             color += Lo;
-            color = pow(color, vec3(1.0f / 1.3));
+            color = pow(color, vec3(1.0f / 2.2));
 
             finalP.pos = finalP.pos + 0.001 * finalP.normal;
             // depthDist += dist;
@@ -527,31 +525,31 @@ void main() {
             //     color = color * 0.;
             // }
 
-            if (DOM_LIGHT > 0) {
-                int raylaunched = 0;
-                vec3 lighDomeColor = vec3(0, 0, 0);
-                for (int j = 0; j < DOM_LIGHT; j++) {
-                    vec2 randomNum = vec2(random(rseed), random(rseed));
-                    float r1 = randomNum.x;
-                    float r2 = randomNum.y;
-                    float theta = r1 * PI;
-                    float phi = r2 * 2 * PI;
+            // if (DOM_LIGHT > 0) {
+            //     int raylaunched = 0;
+            //     vec3 lighDomeColor = vec3(0, 0, 0);
+            //     for (int j = 0; j < DOM_LIGHT; j++) {
+            //         vec2 randomNum = vec2(random(rseed), random(rseed));
+            //         float r1 = randomNum.x;
+            //         float r2 = randomNum.y;
+            //         float theta = r1 * PI;
+            //         float phi = r2 * 2 * PI;
 
-                    vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
-                    if (dot(d, finalP.normal) > 0) {
-                        raylaunched++;
-                        vec3 temp =
-                            PBR(normalize(d), V, N, sunColor, metallic, roughness, finalP.color);
-                        if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
-                            temp = color * 0.;
-                        }
-                        lighDomeColor += temp;
-                    }
-                }
-                lighDomeColor =
-                    (raylaunched > 0) ? lighDomeColor / float(raylaunched) : vec3(0, 0, 0);
-                color = color + lighDomeColor * 0.5;
-            }
+            //         vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
+            //         if (dot(d, finalP.normal) > 0) {
+            //             raylaunched++;
+            //             vec3 temp =
+            //                 PBR(normalize(d), V, N, sunColor, metallic, roughness, finalP.color);
+            //             if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
+            //                 temp = color * 0.;
+            //             }
+            //             lighDomeColor += temp;
+            //         }
+            //     }
+            //     lighDomeColor =
+            //         (raylaunched > 0) ? lighDomeColor / float(raylaunched) : vec3(0, 0, 0);
+            //     color = color + lighDomeColor * 0.5;
+            // }
 
             ImageColor += color;
         } else {
@@ -562,7 +560,7 @@ void main() {
 
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
 
-    // finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
+    finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
     gl_FragDepth = distanceToZBufferValue(depthDist / ANTI_ALIASING_FACTOR, 0.1, 100.0);
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
