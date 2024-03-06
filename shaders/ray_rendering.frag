@@ -22,7 +22,7 @@ const uint DOM_LIGHT = 0;
 //// Struct ////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-struct HitPointLight {
+struct PointLight {
     vec4 position;  // ignore w
     vec4 color;     // w is intensity
 };
@@ -74,7 +74,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 view;
     mat4 invView;
     vec4 ambientLightColor;  // w is intensity
-    HitPointLight HitPointLights[10];
+    PointLight HitPointLights[10];
     int numLights;
     float frameTime;
 }
@@ -412,7 +412,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) { return F0 + (1.0 - F0) * pow(1.0 
 
 // Specular BRDF composition --------------------------------------------
 
-vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughness, vec3 albedo) {
+vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughness, vec3 albedo, float attenuation) {
     vec3 H = normalize(V + L);
     vec3 F0 = mix(vec3(0.04), pow(albedo, vec3(2.2)), metallic);
     float NDF = distributionGGX(N, H, roughness);
@@ -426,7 +426,7 @@ vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughnes
     vec3 specular = numerator / max(denominator, 0.001);
 
     float NdotL = max(dot(N, L), 0.0);
-    vec3 color = lightColor * (kD * pow(albedo, vec3(2.2)) / PI + specular) * (NdotL / 1);
+    vec3 color = lightColor* attenuation * (kD * pow(albedo, vec3(2.2)) / PI + specular) * (NdotL / 1);
 
     return color;
 }
@@ -441,14 +441,24 @@ vec3 sunLight(
         return vec3(0);
     } else {
         return PBR(
-
-
             sunDir, -r.rd, finalP.normal, sunColor, finalP.material.metallic,
-            finalP.material.roughness, finalP.material.albedo);
+            finalP.material.roughness, finalP.material.albedo, 1.0);
     }
 }
 
-vec3 pointLight() { return vec3(1, 1, 1); }
+vec3 pointLight(Ray r, PointLight pl, HitPoint finalP, Object[100] objects, uint nbOfObjects) { 
+    vec3 lightdir = normalize(pl.position.xyz - finalP.pos);
+    
+    if (checkIfShadow(lightdir, finalP, objects, nbOfObjects)) {
+        return vec3(0);
+    } else {
+        float d = length(pl.position.xyz - finalP.pos);
+        float attenuation = 1.0 / (d * d);
+        return PBR(
+            lightdir, -r.rd, finalP.normal, pl.color.xyz, finalP.material.metallic,
+            finalP.material.roughness, finalP.material.albedo, attenuation);
+    }
+ }
 
 vec3 skyLight() { return vec3(1, 1, 1); }
 
@@ -459,15 +469,15 @@ vec3 skyLight() { return vec3(1, 1, 1); }
 void main() {
     Object plan = createObject(
         Plan, 0, 0, TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
-        Material(vec3(1, 1, 1), 0.1, 0.1));
+        Material(vec3(1, 1, 1), 0.1, 0.5));
 
     Object block1 = createObject(
-        Sphere, 0, 0, TransformComponent(vec3(-1.5, 0, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
-        Material(pow(vec3(0.2, 1, 0.2),vec3(2.2)), 0.5, 0.5));
+        Sphere, 0, 0, TransformComponent(vec3(-1.5, 1, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
+        Material(vec3(1, 0, 0), 0.9, 0.1));
 
     Object block2 = createObject(
-        Box, 0, 0, TransformComponent(vec3(1.5, 0, 0), vec3(1, 0.5, 1), vec3(0, 0, 0)),
-        Material(vec3(0.1, 0.2, 1), 0.1, 1));
+        Box, 0, 0, TransformComponent(vec3(1.5, 1, 0), vec3(1, 0.5, 1), vec3(0, 0, 0)),
+        Material(vec3(0, 0, 1), 1, 0.2));
 
     Object objects[100];
     objects[0] = plan;
@@ -498,26 +508,22 @@ void main() {
 
         HitPoint finalP = intersect(ray, objects, nbOfObjects, dist);
         if (!(dist == 1.0 / 0.0 || dist < 0)) {
-            finalP.pos += 0.0001 * finalP.normal; 
-
-            vec3 Lo = vec3(0.0);
-            Lo += sunLight(ray, sunDir, sunColor, finalP, objects, nbOfObjects);
-
-            // for(int w = 0; w < ubo.numLights; w++) {
-            //     vec3 L = ubo.HitPointLights[w].position.xyz - finalP.pos;
-
-            //     L = normalize(L);
-
-            //     Lo += PBR(L, V, N,ubo.HitPointLights[w].color.xyz, metallic, roughness,
-            //     finalP.color);
-            // }
-
+            finalP.pos += 0.0001 * finalP.normal;
             vec3 color = vec3(0);
-            color += Lo;
+        
+            // color += sunLight(ray, sunDir, sunColor, finalP, objects, nbOfObjects);
+
+            for(int w = 0; w < ubo.numLights; w++) {
+                color += pointLight(ray, ubo.HitPointLights[w], finalP, objects, nbOfObjects);
+            }
+
+            
+        
+
+            color = color / (color + vec3(1.0));
             color = pow(color, vec3(1.0f / 2.2));
 
-            finalP.pos = finalP.pos + 0.001 * finalP.normal;
-            // depthDist += dist;
+            depthDist += dist;
 
             // color = vec3(finalP.normal.x, -finalP.normal.y, finalP.normal.z)/10;
 
@@ -560,7 +566,7 @@ void main() {
 
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
 
-    finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
+    // finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
     gl_FragDepth = distanceToZBufferValue(depthDist / ANTI_ALIASING_FACTOR, 0.1, 100.0);
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
