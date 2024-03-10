@@ -118,6 +118,8 @@ void FirstApp::run() {
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     float totalFrameTime = 0.f;
+    int frameNumber1 = 0;
+    int frameNumber2 = 0;
     while (!lveWindow.shouldClose()) {
         glfwPollEvents();
 
@@ -128,7 +130,10 @@ void FirstApp::run() {
         currentTime = newTime;
         totalFrameTime += frameTime;
 
-        cameraController.moveInPlaneXZ(lveWindow.getGLFWwindow(), frameTime, viewerObject);
+        if(cameraController.moveInPlaneXZ(lveWindow.getGLFWwindow(), frameTime, viewerObject)){
+            frameNumber1 = 0;
+            frameNumber2 = 0;
+        }
 
         camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
@@ -154,7 +159,13 @@ void FirstApp::run() {
             ubo.view = camera.getView();
             ubo.inverseView = camera.getInverseView();
             ubo.frameTime = totalFrameTime;
-
+            if (frameIndex == 0) {
+                ubo.frameNumber = frameNumber1;
+                frameNumber1++;
+            } else {
+                ubo.frameNumber = frameNumber2;
+                frameNumber2++;
+            }
             pointLightSystem.update(frameInfo, ubo);
 
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -176,6 +187,7 @@ void FirstApp::run() {
                 *rayRenderingSystem.getPreviousImage(frameIndex), commandBuffer);
 
             lveRenderer.endFrame();
+
         }
     }
 

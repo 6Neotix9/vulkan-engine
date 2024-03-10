@@ -15,8 +15,9 @@ const uint Cylinder = 0x00000008u;
 
 const float PI = 3.14159265359;
 
-const uint ANTI_ALIASING_FACTOR = 25;
+const uint ANTI_ALIASING_FACTOR = 8;
 const uint DOM_LIGHT = 0;
+const uint MAX_BOUNCE = 2;
 
 ////////////////////////////////////////////////////////
 //// Struct ////////////////////////////////////////////
@@ -77,6 +78,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     PointLight HitPointLights[10];
     int numLights;
     float frameTime;
+    int frameCount;
 }
 ubo;
 
@@ -376,11 +378,15 @@ HitPoint intersect(in Ray ray, in Object[100] objects, in uint numberOfobjects, 
 }
 
 bool checkIfShadow(
-    in vec3 sunDir, in HitPoint hitHitPoint, in Object[100] objects, in uint numberOfobjects) {
+    in vec3 sunDir,
+    in HitPoint hitHitPoint,
+    in Object[100] objects,
+    in uint numberOfobjects,
+    in float distanceMin) {
     float d;
     Ray r = Ray(hitHitPoint.pos, sunDir);
     HitPoint p = intersect(r, objects, numberOfobjects, d);
-    if (d < 0 || d == 1.0 / 0.0)
+    if (d < 0 || d == 1.0 / 0.0 || d >= distanceMin)
         return false;
     else
         return true;
@@ -412,7 +418,15 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) { return F0 + (1.0 - F0) * pow(1.0 
 
 // Specular BRDF composition --------------------------------------------
 
-vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughness, vec3 albedo, float attenuation) {
+vec3 PBR(
+    vec3 L,
+    vec3 V,
+    vec3 N,
+    vec3 lightColor,
+    float metallic,
+    float roughness,
+    vec3 albedo,
+    float attenuation) {
     vec3 H = normalize(V + L);
     vec3 F0 = mix(vec3(0.04), pow(albedo, vec3(2.2)), metallic);
     float NDF = distributionGGX(N, H, roughness);
@@ -426,7 +440,8 @@ vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughnes
     vec3 specular = numerator / max(denominator, 0.001);
 
     float NdotL = max(dot(N, L), 0.0);
-    vec3 color = lightColor* attenuation * (kD * pow(albedo, vec3(2.2)) / PI + specular) * (NdotL / 1);
+    vec3 color =
+        lightColor * attenuation * (kD * pow(albedo, vec3(2.2)) / PI + specular) * (NdotL);
 
     return color;
 }
@@ -437,7 +452,7 @@ vec3 PBR(vec3 L, vec3 V, vec3 N, vec3 lightColor, float metallic, float roughnes
 
 vec3 sunLight(
     Ray r, vec3 sunDir, vec3 sunColor, HitPoint finalP, Object[100] objects, uint nbOfObjects) {
-    if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
+    if (checkIfShadow(sunDir, finalP, objects, nbOfObjects, 1 / 0.0)) {
         return vec3(0);
     } else {
         return PBR(
@@ -446,21 +461,54 @@ vec3 sunLight(
     }
 }
 
-vec3 pointLight(Ray r, PointLight pl, HitPoint finalP, Object[100] objects, uint nbOfObjects) { 
+vec3 pointLight(Ray r, PointLight pl, HitPoint finalP, Object[100] objects, uint nbOfObjects) {
     vec3 lightdir = normalize(pl.position.xyz - finalP.pos);
-    
-    if (checkIfShadow(lightdir, finalP, objects, nbOfObjects)) {
+    float d = length(pl.position.xyz - finalP.pos);
+    if (checkIfShadow(lightdir, finalP, objects, nbOfObjects, d)) {
         return vec3(0);
     } else {
-        float d = length(pl.position.xyz - finalP.pos);
         float attenuation = 1.0 / (d * d);
         return PBR(
             lightdir, -r.rd, finalP.normal, pl.color.xyz, finalP.material.metallic,
             finalP.material.roughness, finalP.material.albedo, attenuation);
     }
- }
+}
 
-vec3 skyLight() { return vec3(1, 1, 1); }
+vec3 skyLight() {
+    // color = vec3(finalP.normal.x, -finalP.normal.y, finalP.normal.z)/10;
+
+    // if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
+    //     color = color * 0.;
+    // }
+
+    // if (DOM_LIGHT > 0) {
+    //     int raylaunched = 0;
+    //     vec3 lighDomeColor = vec3(0, 0, 0);
+    //     for (int j = 0; j < DOM_LIGHT; j++) {
+    //         vec2 randomNum = vec2(random(rseed), random(rseed));
+    //         float r1 = randomNum.x;
+    //         float r2 = randomNum.y;
+    //         float theta = r1 * PI;
+    //         float phi = r2 * 2 * PI;
+
+    //         vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
+    //         if (dot(d, finalP.normal) > 0) {
+    //             raylaunched++;
+    //             vec3 temp =
+    //                 PBR(normalize(d), V, N, sunColor, metallic, roughness, finalP.color);
+    //             if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
+    //                 temp = color * 0.;
+    //             }
+    //             lighDomeColor += temp;
+    //         }
+    //     }
+    //     lighDomeColor =
+    //         (raylaunched > 0) ? lighDomeColor / float(raylaunched) : vec3(0, 0, 0);
+    //     color = color + lighDomeColor * 0.5;
+    // }
+
+    return vec3(1, 1, 1);
+}
 
 ////////////////////////////////////////////////////////
 //// Main Function /////////////////////////////////////
@@ -469,15 +517,15 @@ vec3 skyLight() { return vec3(1, 1, 1); }
 void main() {
     Object plan = createObject(
         Plan, 0, 0, TransformComponent(vec3(0, 2, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
-        Material(vec3(1, 1, 1), 0.1, 0.5));
+        Material(vec3(1, 1, 1), 0., 1.));
 
     Object block1 = createObject(
         Sphere, 0, 0, TransformComponent(vec3(-1.5, 1, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
-        Material(vec3(1, 0, 0), 0.9, 0.1));
+        Material(vec3(1, 0, 0), 1, 0.5));
 
     Object block2 = createObject(
         Box, 0, 0, TransformComponent(vec3(1.5, 1, 0), vec3(1, 0.5, 1), vec3(0, 0, 0)),
-        Material(vec3(0, 0, 1), 1, 0.2));
+        Material(vec3(0, 0, 1), 0, 0.5));
 
     Object objects[100];
     objects[0] = plan;
@@ -501,74 +549,61 @@ void main() {
 
     for (int i = 0; i < ANTI_ALIASING_FACTOR; i++) {
         vec2 randomRayDir = vec2(random(rseed), random(rseed));
-
         Ray ray = createRay(coord + randomRayDir - vec2(0.5, 0.5));
 
-        // intersect
-
         HitPoint finalP = intersect(ray, objects, nbOfObjects, dist);
-        if (!(dist == 1.0 / 0.0 || dist < 0)) {
+        depthDist += dist;
+
+        vec3 mask = vec3(1.0f);
+        int bounce = 0;
+        float c_refl = 1.0f;
+        vec3 color = vec3(0);
+
+        while (!(dist == 1.0 / 0.0 || dist < 0) && bounce < 1) {
             finalP.pos += 0.0001 * finalP.normal;
-            vec3 color = vec3(0);
-        
-            // color += sunLight(ray, sunDir, sunColor, finalP, objects, nbOfObjects);
 
-            for(int w = 0; w < ubo.numLights; w++) {
-                color += pointLight(ray, ubo.HitPointLights[w], finalP, objects, nbOfObjects);
-            }
+            color += sunLight(ray, sunDir, sunColor, finalP, objects, nbOfObjects) * mask;
 
+            // for (int w = 0; w < ubo.numLights; w++) {
+            //     color +=
+            //         pointLight(ray, ubo.HitPointLights[w], finalP, objects, nbOfObjects) * mask;
+            // }
+            vec3 Ve = normalize(ray.ro - finalP.pos);
+            vec3 H = reflect(ray.rd, finalP.normal);
+            c_refl = length(fresnelSchlick(
+                max(dot(Ve  , finalP.normal), 0.0),
+                mix(vec3(0.04), pow(finalP.material.albedo, vec3(2.2)), finalP.material.metallic)));
             
-        
+            mask = mask * ((1.0- finalP.material.roughness) * 0.001);
+            // color = vec3(mask);
+            ray.ro = finalP.pos;
+            ray.rd = reflect(ray.rd, finalP.normal);
+            finalP = intersect(ray, objects, nbOfObjects, dist);
+            bounce++;
+        }
+        ImageColor += color;
+        if((dist == 1.0 / 0.0 || dist < 0)){
+            ImageColor += pow(vec3(0.502, 0.869, 1), vec3(2.2)) * ImageColor * mask * 0.001;
+        }
+        // 
 
-            color = color / (color + vec3(1.0));
-            color = pow(color, vec3(1.0f / 2.2));
-
-            depthDist += dist;
-
-            // color = vec3(finalP.normal.x, -finalP.normal.y, finalP.normal.z)/10;
-
-            // if (checkIfShadow(sunDir, finalP, objects, nbOfObjects)) {
-            //     color = color * 0.;
-            // }
-
-            // if (DOM_LIGHT > 0) {
-            //     int raylaunched = 0;
-            //     vec3 lighDomeColor = vec3(0, 0, 0);
-            //     for (int j = 0; j < DOM_LIGHT; j++) {
-            //         vec2 randomNum = vec2(random(rseed), random(rseed));
-            //         float r1 = randomNum.x;
-            //         float r2 = randomNum.y;
-            //         float theta = r1 * PI;
-            //         float phi = r2 * 2 * PI;
-
-            //         vec3 d = vec3(sin(phi) * sin(theta), cos(phi) * sin(theta), cos(theta));
-            //         if (dot(d, finalP.normal) > 0) {
-            //             raylaunched++;
-            //             vec3 temp =
-            //                 PBR(normalize(d), V, N, sunColor, metallic, roughness, finalP.color);
-            //             if (checkIfShadow(d, finalP, objects, nbOfObjects)) {
-            //                 temp = color * 0.;
-            //             }
-            //             lighDomeColor += temp;
-            //         }
-            //     }
-            //     lighDomeColor =
-            //         (raylaunched > 0) ? lighDomeColor / float(raylaunched) : vec3(0, 0, 0);
-            //     color = color + lighDomeColor * 0.5;
-            // }
-
-            ImageColor += color;
-        } else {
-            ImageColor += vec3(0.502, 0.869, 1);
+        if (bounce == 0) {
+            ImageColor += pow(vec3(0.502, 0.869, 1), vec3(2.2));
             depthDist = 1.0 / 0.0;
         }
     }
 
     vec3 finalColor = ImageColor / ANTI_ALIASING_FACTOR;
+    finalColor = finalColor / (finalColor + vec3(1.0));
+    finalColor = pow(finalColor, vec3(1.0f / 2.2));
 
-    // finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb * 0.5;
+    // // finalColor = finalColor * 0.5 + texture(previousImage, coord / vec2(3840, 2160)).rgb *
+    // 0.5; if (ubo.frameCount > 0) {
+    //     float merginFactor = 1.0 / float(ubo.frameCount);
+    //     finalColor = finalColor * merginFactor +
+    //                  texture(previousImage, coord / vec2(3840, 2160)).rgb * (1.0 - merginFactor);
+    // }
     gl_FragDepth = distanceToZBufferValue(depthDist / ANTI_ALIASING_FACTOR, 0.1, 100.0);
     outColor2 = vec4(finalColor, 1);
     outColor = vec4(finalColor, 1);
-    // outColor = vec4(random(rseed), random(rseed), random(rseed), 1);
 }

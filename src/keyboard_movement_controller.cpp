@@ -5,9 +5,10 @@
 
 namespace lve {
 
-void KeyboardMovementController::moveInPlaneXZ(
+bool KeyboardMovementController::moveInPlaneXZ(
     GLFWwindow* window, float dt, LveGameObject& gameObject) {
     glm::vec3 rotate{0};
+    bool retour = false;
     if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
     if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;
     if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) rotate.x += 1.f;
@@ -40,7 +41,9 @@ void KeyboardMovementController::moveInPlaneXZ(
     if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
         gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
     }
+    if (rotate != glm::vec3(0) || moveDir != glm::vec3(0)) retour = true;
     moveSpeed = 3;
+    return retour;
 }
 
 }  // namespace lve

@@ -23,6 +23,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     PointLight pointLights[10];
     int numLights;
     float frameTime;
+    int frameCount;
 }
 ubo;
 

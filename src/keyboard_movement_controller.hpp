@@ -20,7 +20,7 @@ class KeyboardMovementController {
         int fast = GLFW_KEY_LEFT_SHIFT;
     };
 
-    void moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);
+    bool moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);
 
 
     KeyMappings keys{};
