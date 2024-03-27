@@ -1,13 +1,13 @@
-#include "wave_IHFFT.hpp"
+#include "wave_IVFFT.hpp"
 
 #include "lve_swap_chain.hpp"
 namespace lve {
-WaveIHFFT::WaveIHFFT(
+WaveIVFFT::WaveIVFFT(
     LveDevice &device,
     std::vector<std::shared_ptr<LveImage>> buffer0,
     std::vector<std::shared_ptr<LveImage>> buffer1,
     std::shared_ptr<LveImage> preComputeData)
-    : LveASystem(device, "wave_textureInverseHorizontalFFT", nullptr),
+    : LveASystem(device, "wave_textureInverseVerticalFFT", nullptr),
       buffer0{buffer0},
       buffer1{buffer1},
       precomputeData{preComputeData} {
@@ -18,10 +18,10 @@ WaveIHFFT::WaveIHFFT(
     createDescriptorSetLayout();
     createDescriptorSet();
 }
-WaveIHFFT::~WaveIHFFT() { vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr); }
+WaveIVFFT::~WaveIVFFT() { vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr); }
 
-void WaveIHFFT::createDescriptorPool() {
-    waveIHFFTPool =
+void WaveIVFFT::createDescriptorPool() {
+    waveIVFFTPool =
         LveDescriptorPool::Builder(lveDevice)
             .setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, LveSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -30,18 +30,17 @@ void WaveIHFFT::createDescriptorPool() {
             .build();
 }
 
-void WaveIHFFT::createDescriptorSetLayout() {
-    waveIHFFTLayout =
+void WaveIVFFT::createDescriptorSetLayout() {
+    waveIVFFTLayout =
         LveDescriptorSetLayout::Builder(lveDevice)
             .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
             .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
-                           
+            .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)        
             .build();
 }
 
-void WaveIHFFT::createDescriptorSet() {
-    waveIHFFTDescriptorSets.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+void WaveIVFFT::createDescriptorSet() {
+    waveIVFFTDescriptorSets.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
 
     for (size_t i = 0; i < LveSwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
         VkDescriptorImageInfo bufferDescriptorInfo0{};
@@ -56,11 +55,11 @@ void WaveIHFFT::createDescriptorSet() {
         precomputeDataDescriptorInfo.imageView = precomputeData->getVkImageView();
         precomputeDataDescriptorInfo.imageLayout = precomputeData->getVkImageLayout();
 
-        LveDescriptorWriter(*waveIHFFTLayout, *waveIHFFTPool)
+        LveDescriptorWriter(*waveIVFFTLayout, *waveIVFFTPool)
             .writeImage(0, &bufferDescriptorInfo0)
             .writeImage(1, &bufferDescriptorInfo1)
             .writeImage(2, &precomputeDataDescriptorInfo)
-            .build(waveIHFFTDescriptorSets[i]);
+            .build(waveIVFFTDescriptorSets[i]);
     }
 }
 

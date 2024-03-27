@@ -521,7 +521,7 @@ void main() {
 
     Object block1 = createObject(
         Sphere, 0, 0, TransformComponent(vec3(-1.5, 1, 0), vec3(1, 1, 1), vec3(0, 0, 0)),
-        Material(vec3(1, 0, 0), 1, 0.5));
+        Material(vec3(1, 0, 0), 1, 0.9));
 
     Object block2 = createObject(
         Box, 0, 0, TransformComponent(vec3(1.5, 1, 0), vec3(1, 0.5, 1), vec3(0, 0, 0)),
@@ -559,7 +559,7 @@ void main() {
         float c_refl = 1.0f;
         vec3 color = vec3(0);
 
-        while (!(dist == 1.0 / 0.0 || dist < 0) && bounce < 1) {
+        while (!(dist == 1.0 / 0.0 || dist < 0) && bounce < 2) {
             finalP.pos += 0.0001 * finalP.normal;
 
             color += sunLight(ray, sunDir, sunColor, finalP, objects, nbOfObjects) * mask;
@@ -574,7 +574,7 @@ void main() {
                 max(dot(Ve  , finalP.normal), 0.0),
                 mix(vec3(0.04), pow(finalP.material.albedo, vec3(2.2)), finalP.material.metallic)));
             
-            mask = mask * ((1.0- finalP.material.roughness) * 0.001);
+            mask = mask  * max(c_refl-finalP.material.roughness, 0.0);
             // color = vec3(mask);
             ray.ro = finalP.pos;
             ray.rd = reflect(ray.rd, finalP.normal);
