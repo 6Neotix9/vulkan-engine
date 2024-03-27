@@ -3,18 +3,18 @@
 #include <vulkan/vulkan_core.h>
 
 // std
-#include <array>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <set>
 #include <stdexcept>
 
 #include "lve_device.hpp"
 #include "lve_image.hpp"
 #include "lve_pipeline_ressources.hpp"
+#include "lve_sync.hpp"
 
 namespace lve {
 
@@ -95,23 +95,29 @@ VkResult LveSwapChain::acquireNextImage(uint32_t *imageIndex) {
         imageAvailableSemaphores[currentFrame],  // must be a not signaled semaphore
         VK_NULL_HANDLE,
         imageIndex);
+    LveSync *sync = LveSync::getInstance();
+    sync->semaphores.push_back(imageAvailableSemaphores[currentFrame]);
 
     return result;
 }
 
 VkResult LveSwapChain::submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex) {
+    LveSync* sync = LveSync::getInstance();
+
     if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(device->device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
     }
+
+
     imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
+
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = waitSemaphores;
+    submitInfo.waitSemaphoreCount = sync->semaphores.size();
+    submitInfo.pWaitSemaphores = sync->semaphores.data();
     submitInfo.pWaitDstStageMask = waitStages;
 
     submitInfo.commandBufferCount = 1;
@@ -122,16 +128,25 @@ VkResult LveSwapChain::submitCommandBuffers(const VkCommandBuffer *buffers, uint
     submitInfo.pSignalSemaphores = signalSemaphores;
 
     vkResetFences(device->device(), 1, &inFlightFences[currentFrame]);
-    if (vkQueueSubmit(device->graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
-        VK_SUCCESS) {
+    sync->fences.push_back(inFlightFences[currentFrame]);
+    auto result = vkQueueSubmit(device->graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]);
+    if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
+    sync->semaphores.clear();
+    sync->semaphores.push_back((renderFinishedSemaphores)[currentFrame]);
 
+    return result;
+}
+
+
+VkResult LveSwapChain::presentFrame(uint32_t *imageIndex){
+    LveSync* sync = LveSync::getInstance();
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-    presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = signalSemaphores;
+    presentInfo.waitSemaphoreCount = sync->semaphores.size();
+    presentInfo.pWaitSemaphores = sync->semaphores.data();
 
     VkSwapchainKHR swapChains[] = {swapChain};
     presentInfo.swapchainCount = 1;
@@ -141,6 +156,7 @@ VkResult LveSwapChain::submitCommandBuffers(const VkCommandBuffer *buffers, uint
 
     auto result = vkQueuePresentKHR(device->presentQueue(), &presentInfo);
 
+    sync->semaphores.clear();
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return result;

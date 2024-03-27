@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <vulkan/vulkan_core.h>
 #include "lve_device.hpp"
+#include "lve_frame_info.hpp"
 #include "lve_pipeline_ressources.hpp"
 #include "lve_swap_chain.hpp"
 #include "lve_window.hpp"
@@ -29,6 +30,10 @@ VkExtent2D getSwapChainExtent() const { return lveSwapChain->getSwapChainExtent(
     assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
     return commandBuffers[currentFrameIndex];
   }
+  VkCommandBuffer getCurrentPreProcessCommandBuffer() const {
+    assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
+    return preProcessCommandBuffers[currentFrameIndex];
+  }
 
   int getFrameIndex() const {
     assert(isFrameStarted && "Cannot get frame index when frame not in progress");
@@ -39,8 +44,17 @@ VkExtent2D getSwapChainExtent() const { return lveSwapChain->getSwapChainExtent(
     return currentImageIndex;
   }
 
-  VkCommandBuffer beginFrame();
-  void endFrame();
+  frameCommandBuffers beginFrame();
+
+  void startRenderFrame();
+
+  void endRenderFrame();
+
+  void startPreProcess();
+  void endPreProcess();
+
+  void presentFrame();
+
   void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
   void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
@@ -50,11 +64,18 @@ VkExtent2D getSwapChainExtent() const { return lveSwapChain->getSwapChainExtent(
   void createCommandBuffers();
   void freeCommandBuffers();
   void recreateSwapChain();
+  void createSemaphore();
 
   LveWindow &lveWindow;
   LveDevice *lveDevice;
   std::unique_ptr<LveSwapChain> lveSwapChain;
   std::vector<VkCommandBuffer> commandBuffers;
+
+  std::vector<VkCommandBuffer> preProcessCommandBuffers;
+  std::vector<VkSemaphore> preComputeFinishedSemaphores;
+
+
+
   std::shared_ptr<LvePipelineRessources> pipelineRessources;
 
   uint32_t currentImageIndex;

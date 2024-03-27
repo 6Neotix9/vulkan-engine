@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include <mutex>
-
-
+#include <vulkan/vulkan_core.h>
+#include <vector>
 namespace lve {
 class LveSync {
    public:
@@ -21,6 +21,9 @@ class LveSync {
     void setStopRendering(bool stop) { 
         stopRendering = stop; }
     
+    std::vector<VkFence> fences;
+    std::vector<VkSemaphore> semaphores;
+
 
    
    private:

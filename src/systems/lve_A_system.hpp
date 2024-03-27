@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "lve_device.hpp"
+#include "lve_frame_info.hpp"
 #include "lve_pipeline_ressources.hpp"
 #include "lve_pipeline.hpp"
 #include "lve_c_pipeline.hpp"
@@ -14,6 +15,8 @@ class LveASystem {
     void reloadShaders();
     virtual void createPipeline() = 0;
     virtual void createPipelineLayout(std::vector<VkDescriptorSetLayout> descriptorSetLayouts) = 0;
+    virtual void executeShader(FrameInfo &frameInfo) = 0;
+   
    protected:
     LveDevice &lveDevice;
     std::shared_ptr<LvePipelineRessources> pipelineRessources;

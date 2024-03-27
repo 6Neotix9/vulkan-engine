@@ -1,7 +1,5 @@
 #include "simple_render_system.hpp"
 #include <vulkan/vulkan_core.h>
-#include <iostream>
-#include <thread>
 #include <vector>
 #include "lve_pipeline_ressources.hpp"
 #include "systems/lve_A_system.hpp"
@@ -14,7 +12,6 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <array>
 #include <cassert>
 #include <stdexcept>
 
@@ -73,11 +70,11 @@ void SimpleRenderSystem::createPipeline() {
 }
 
 
-void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
-    lvePipeline->bind(frameInfo.commandBuffer);
+void SimpleRenderSystem::executeShader(FrameInfo& frameInfo) {
+    lvePipeline->bind(frameInfo.commandBuffer.renderCommandBuffer);
 
     vkCmdBindDescriptorSets(
-        frameInfo.commandBuffer,
+        frameInfo.commandBuffer.renderCommandBuffer,
         VK_PIPELINE_BIND_POINT_GRAPHICS,
         pipelineLayout,
         0,
@@ -94,14 +91,14 @@ void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
         push.normalMatrix = obj.transform.normalMatrix();
 
         vkCmdPushConstants(
-            frameInfo.commandBuffer,
+            frameInfo.commandBuffer.renderCommandBuffer,
             pipelineLayout,
             VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             0,
             sizeof(SimplePushConstantData),
             &push);
-        obj.model->bind(frameInfo.commandBuffer);
-        obj.model->draw(frameInfo.commandBuffer);
+        obj.model->bind(frameInfo.commandBuffer.renderCommandBuffer);
+        obj.model->draw(frameInfo.commandBuffer.renderCommandBuffer);
     }
 }
 

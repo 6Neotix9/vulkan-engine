@@ -2,18 +2,17 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include "lve_c_pipeline.hpp"
 #include "lve_descriptors.hpp"
 #include "lve_device.hpp"
 #include "lve_image.hpp"
-#include "systems/lve_A_system.hpp"
 
 // std
 #include <memory>
-#include <mutex>
 #include <vector>
 
 namespace lve {
-class BRDF_LUTSystem : public LveASystem {
+class BRDF_LUTSystem {
    public:
     BRDF_LUTSystem(LveDevice &device);
     ~BRDF_LUTSystem();
@@ -28,13 +27,15 @@ class BRDF_LUTSystem : public LveASystem {
     std::shared_ptr<LveImage> brdfLUTImage;
     std::unique_ptr<LveDescriptorPool> brdfLUTDescriptorPool;
     std::unique_ptr<LveDescriptorSetLayout> brdfLUTDescriptorLayout;
+    std::unique_ptr<LveCPipeline> lveCPipeline;
     VkDescriptorSet brdfLUTDescriptorSet;
-
+    VkPipelineLayout pipelineLayout;
+    LveDevice &lveDevice;
     void createBRDFLUTImage();
     void createDescriptorSet();
     void createDescriptorSetLayout();
     void createDescriptorPool();
-    void createPipelineLayout(std::vector<VkDescriptorSetLayout> descriptorSetLayouts) override;
-    void createPipeline() override;
+    void createPipelineLayout(std::vector<VkDescriptorSetLayout> descriptorSetLayouts);
+    void createPipeline();
 };
 }  // namespace lve

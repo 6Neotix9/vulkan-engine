@@ -1,11 +1,6 @@
 #include "lve_A_system.hpp"
 #include "../lve_hot_reload.hpp"
 
-
-#include <vector>
-
-
-
 namespace lve {
 
 LveASystem::LveASystem(

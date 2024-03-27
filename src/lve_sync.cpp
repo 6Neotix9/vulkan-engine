@@ -1,7 +1,5 @@
 #include "lve_sync.hpp"
 
-#include <iostream>
-
 namespace lve {
 
 

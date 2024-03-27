@@ -9,7 +9,6 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <array>
 #include <cassert>
 #include <map>
 #include <stdexcept>
@@ -94,7 +93,7 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {
     ubo.numLights = lightIndex;
 }
 
-void PointLightSystem::render(FrameInfo& frameInfo) {
+void PointLightSystem::executeShader(FrameInfo& frameInfo) {
     // sort lights
     std::map<float, LveGameObject::id_t> sorted;
     for (auto& kv : frameInfo.gameObjects) {
@@ -107,10 +106,10 @@ void PointLightSystem::render(FrameInfo& frameInfo) {
         sorted[disSquared] = obj.getId();
     }
 
-    lvePipeline->bind(frameInfo.commandBuffer);
+    lvePipeline->bind(frameInfo.commandBuffer.renderCommandBuffer);
 
     vkCmdBindDescriptorSets(
-        frameInfo.commandBuffer,
+        frameInfo.commandBuffer.renderCommandBuffer,
         VK_PIPELINE_BIND_POINT_GRAPHICS,
         pipelineLayout,
         0,
@@ -130,13 +129,13 @@ void PointLightSystem::render(FrameInfo& frameInfo) {
         push.radius = obj.transform.scale.x;
 
         vkCmdPushConstants(
-            frameInfo.commandBuffer,
+            frameInfo.commandBuffer.renderCommandBuffer,
             pipelineLayout,
             VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             0,
             sizeof(PointLightPushConstants),
             &push);
-        vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
+        vkCmdDraw(frameInfo.commandBuffer.renderCommandBuffer, 6, 1, 0, 0);
     }
 }
 

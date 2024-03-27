@@ -8,7 +8,6 @@
 // std
 #include <memory>
 #include <vector>
-#include <mutex>
 
 namespace lve {
 class SimpleRenderSystem : public LveASystem {
@@ -20,7 +19,7 @@ class SimpleRenderSystem : public LveASystem {
     SimpleRenderSystem(const SimpleRenderSystem &) = delete;
     SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
-    void renderGameObjects(FrameInfo &frameInfo);
+    void executeShader(FrameInfo &frameInfo) override;
 
 
 

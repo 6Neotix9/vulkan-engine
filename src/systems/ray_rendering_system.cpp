@@ -16,9 +16,7 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <array>
 #include <cassert>
-#include <map>
 #include <stdexcept>
 
 namespace lve {
@@ -163,13 +161,13 @@ void RayRenderingSystem::createRandomImage() {
 
 void RayRenderingSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {}
 
-void RayRenderingSystem::render(FrameInfo& frameInfo) {
-    lvePipeline->bind(frameInfo.commandBuffer);
+void RayRenderingSystem::executeShader(FrameInfo& frameInfo) {
+    lvePipeline->bind(frameInfo.commandBuffer.renderCommandBuffer);
 
     ResolutionPushConstant pushConstant{};
     pushConstant.resolution = glm::vec2(frameInfo.extent.width, frameInfo.extent.height);
     vkCmdPushConstants(
-        frameInfo.commandBuffer,
+        frameInfo.commandBuffer.renderCommandBuffer,
         pipelineLayout,
         VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0,
@@ -180,7 +178,7 @@ void RayRenderingSystem::render(FrameInfo& frameInfo) {
         randomImageDescriptorSet,
             previousImageDescriptorSets[frameInfo.frameIndex]};
     vkCmdBindDescriptorSets(
-        frameInfo.commandBuffer,
+        frameInfo.commandBuffer.renderCommandBuffer,
         VK_PIPELINE_BIND_POINT_GRAPHICS,
         pipelineLayout,
         0,
@@ -189,7 +187,7 @@ void RayRenderingSystem::render(FrameInfo& frameInfo) {
         0,
         nullptr);
 
-    vkCmdDraw(frameInfo.commandBuffer, 3, 1, 0, 0);
+    vkCmdDraw(frameInfo.commandBuffer.renderCommandBuffer, 3, 1, 0, 0);
 }
 
 }  // namespace lve

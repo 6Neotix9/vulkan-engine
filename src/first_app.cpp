@@ -7,7 +7,9 @@
 #include "keyboard_movement_controller.hpp"
 #include "lve_buffer.hpp"
 #include "lve_camera.hpp"
+#include "lve_frame_info.hpp"
 #include "lve_image.hpp"
+#include "lve_renderer.hpp"
 #include "lve_swap_chain.hpp"
 #include "systems/BRDF_LUT_system.hpp"
 #include "systems/point_light_system.hpp"
@@ -21,13 +23,13 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <stdlib.h>
+// #include <stdlib.h>
 
-#include <array>
-#include <cassert>
+// #include <array>
+// #include <cassert>
 #include <chrono>
-#include <iostream>
-#include <stdexcept>
+// #include <iostream>
+// #include <stdexcept>
 namespace lve {
 
 FirstApp::FirstApp() {
@@ -139,8 +141,8 @@ void FirstApp::run() {
 
         float aspect = lveRenderer.getAspectRatio();
         camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
-
-        if (auto commandBuffer = lveRenderer.beginFrame()) {
+        auto commandBuffer = lveRenderer.beginFrame();
+        if (commandBuffer.renderCommandBuffer != nullptr && commandBuffer.preProcessommandBuffer != nullptr) {
             int frameIndex = lveRenderer.getFrameIndex();
             FrameInfo frameInfo{
                 frameIndex,
@@ -171,22 +173,35 @@ void FirstApp::run() {
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
 
+            //pre-process
+            lveRenderer.startPreProcess();
+            VkImageLayout t;
+            t = BRDF_LUTImage->getActualImageLayout();
+
+            BRDF_LUTImage->transitionImageLayout(t, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, frameInfo.commandBuffer.preProcessommandBuffer);
+            BRDF_LUTImage->transitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, t, frameInfo.commandBuffer.preProcessommandBuffer);
+            
+            lveRenderer.endPreProcess();
+
             // render
-            lveRenderer.beginSwapChainRenderPass(commandBuffer);
+            lveRenderer.startRenderFrame();
+
+            lveRenderer.beginSwapChainRenderPass(commandBuffer.renderCommandBuffer);
 
             // order here matters
-            rayRenderingSystem.render(frameInfo);
+            rayRenderingSystem.executeShader(frameInfo);
             // simpleRenderSystem.renderGameObjects(frameInfo);
-            pointLightSystem.render(frameInfo);
+            pointLightSystem.executeShader(frameInfo);
 
-            lveRenderer.endSwapChainRenderPass(commandBuffer);
+            lveRenderer.endSwapChainRenderPass(commandBuffer.renderCommandBuffer);
             LveImage::copyImage(
                 lveDevice,
                 *lveRenderer.getSwapchainPipeLineRessources()->getImageColorAttachment(
                     frameInfo.swapchainFrameIndex)[1],
-                *rayRenderingSystem.getPreviousImage(frameIndex), commandBuffer);
+                *rayRenderingSystem.getPreviousImage(frameIndex), commandBuffer.renderCommandBuffer);
 
-            lveRenderer.endFrame();
+            lveRenderer.endRenderFrame();
+            lveRenderer.presentFrame();
 
         }
     }

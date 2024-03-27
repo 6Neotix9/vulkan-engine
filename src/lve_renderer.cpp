@@ -1,4 +1,5 @@
 #include "lve_renderer.hpp"
+
 #include <vulkan/vulkan_core.h>
 
 #include "lve_pipeline_ressources.hpp"
@@ -16,9 +17,15 @@ LveRenderer::LveRenderer(LveWindow& window, LveDevice* device)
     pipelineRessources = std::make_shared<LvePipelineRessources>();
     recreateSwapChain();
     createCommandBuffers();
+    createSemaphore();
 }
 
-LveRenderer::~LveRenderer() { freeCommandBuffers(); }
+LveRenderer::~LveRenderer() {
+    freeCommandBuffers();
+    for (size_t i = 0; i < LveSwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(lveDevice->device(), preComputeFinishedSemaphores[i], nullptr);
+    }
+}
 
 void LveRenderer::recreateSwapChain() {
     auto extent = lveWindow.getExtent();
@@ -32,7 +39,8 @@ void LveRenderer::recreateSwapChain() {
         lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, pipelineRessources);
     } else {
         std::shared_ptr<LveSwapChain> oldSwapChain = std::move(lveSwapChain);
-        lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, oldSwapChain, pipelineRessources);
+        lveSwapChain =
+            std::make_unique<LveSwapChain>(lveDevice, extent, oldSwapChain, pipelineRessources);
 
         if (!oldSwapChain->compareSwapFormats(*lveSwapChain.get())) {
             throw std::runtime_error("Swap chain image(or depth) format has changed!");
@@ -43,6 +51,7 @@ void LveRenderer::recreateSwapChain() {
 
 void LveRenderer::createCommandBuffers() {
     commandBuffers.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+    preProcessCommandBuffers.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -54,6 +63,29 @@ void LveRenderer::createCommandBuffers() {
         VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
+    if (vkAllocateCommandBuffers(
+            lveDevice->device(),
+            &allocInfo,
+            preProcessCommandBuffers.data()) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
+}
+
+void LveRenderer::createSemaphore() {
+    preComputeFinishedSemaphores.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    for (size_t i = 0; i < LveSwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
+        if (vkCreateSemaphore(
+                lveDevice->device(),
+                &semaphoreInfo,
+                nullptr,
+                &preComputeFinishedSemaphores[i]) != VK_SUCCESS) {
+            throw std::runtime_error(
+                "failed to create compute synchronization objects for a frame!");
+        }
+    }
 }
 
 void LveRenderer::freeCommandBuffers() {
@@ -63,19 +95,25 @@ void LveRenderer::freeCommandBuffers() {
         static_cast<uint32_t>(commandBuffers.size()),
         commandBuffers.data());
     commandBuffers.clear();
+    vkFreeCommandBuffers(
+        lveDevice->device(),
+        lveDevice->getCommandPool(),
+        static_cast<uint32_t>(preProcessCommandBuffers.size()),
+        preProcessCommandBuffers.data());
+    commandBuffers.clear();
 }
 
-VkCommandBuffer LveRenderer::beginFrame() {
+frameCommandBuffers LveRenderer::beginFrame() {
     assert(!isFrameStarted && "Can't call beginFrame while already in progress");
     if (LveSync::getInstance()->getStopRendering()) {
         LveSync::getInstance()->getwaitForStopRenderingMutex().unlock();
-        return nullptr;
+        return {nullptr, nullptr};
     }
 
     auto result = lveSwapChain->acquireNextImage(&currentImageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapChain();
-        return nullptr;
+        return {nullptr, nullptr};
     }
 
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -85,23 +123,66 @@ VkCommandBuffer LveRenderer::beginFrame() {
     isFrameStarted = true;
 
     auto commandBuffer = getCurrentCommandBuffer();
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        throw std::runtime_error("failed to begin recording command buffer!");
-    }
-    return commandBuffer;
+    auto preProcessCommandBuffer = getCurrentPreProcessCommandBuffer();
+    return {commandBuffer, preProcessCommandBuffer};
 }
 
-void LveRenderer::endFrame() {
+void LveRenderer::startRenderFrame() {
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    if (vkBeginCommandBuffer(getCurrentCommandBuffer(), &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+}
+
+void LveRenderer::endRenderFrame() {
     assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
     auto commandBuffer = getCurrentCommandBuffer();
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-
     auto result = lveSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
+}
+
+void LveRenderer::startPreProcess() {
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    if (vkBeginCommandBuffer(getCurrentPreProcessCommandBuffer(), &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+}
+
+void LveRenderer::endPreProcess() {
+    LveSync* sync = LveSync::getInstance();
+
+    VkCommandBuffer preCommandBuffer = getCurrentPreProcessCommandBuffer();
+    if (vkEndCommandBuffer(preCommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
+    }
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    VkSemaphore signalSemaphores[] = {preComputeFinishedSemaphores[currentFrameIndex]};
+
+    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &preCommandBuffer;
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = signalSemaphores;
+    submitInfo.waitSemaphoreCount = sync->semaphores.size();
+    submitInfo.pWaitSemaphores = sync->semaphores.data();
+    submitInfo.pWaitDstStageMask = waitStages;
+
+    if (vkQueueSubmit(lveDevice->graphicsQueue(), 1, &submitInfo, nullptr) != VK_SUCCESS) {
+        throw std::runtime_error("failed to submit compute command buffer!");
+    }
+    sync->semaphores.clear();
+    sync->semaphores.push_back(preComputeFinishedSemaphores[currentFrameIndex]);
+}
+
+void LveRenderer::presentFrame() {
+    auto result = lveSwapChain->presentFrame(&currentImageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
         lveWindow.wasWindowResized()) {
         lveWindow.resetWindowResizedFlag();

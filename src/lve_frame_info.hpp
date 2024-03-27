@@ -27,12 +27,18 @@ struct GlobalUbo {
   int frameNumber;
 };
 
+struct frameCommandBuffers{
+  VkCommandBuffer renderCommandBuffer;
+  VkCommandBuffer preProcessommandBuffer;
+};
+
 struct FrameInfo {
   int frameIndex;
   uint swapchainFrameIndex;
   float frameTime;
   VkExtent2D extent;
-  VkCommandBuffer commandBuffer;
+  frameCommandBuffers commandBuffer;
+  
   LveCamera &camera;
   VkDescriptorSet globalDescriptorSet;
   LveGameObject::Map &gameObjects;

@@ -24,7 +24,7 @@ class RayRenderingSystem : public LveASystem {
     RayRenderingSystem &operator=(const RayRenderingSystem &) = delete;
 
     void update(FrameInfo &frameInfo, GlobalUbo &ubo);
-    void render(FrameInfo &frameInfo);
+    void executeShader(FrameInfo &frameInfo) override;
     std::shared_ptr<LveImage> getPreviousImage(uint i) const {return previousImages[i];}
     
    private:

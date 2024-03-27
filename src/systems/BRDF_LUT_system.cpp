@@ -2,16 +2,13 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <iostream>
-#include <thread>
 #include <vector>
 
 #include "lve_c_pipeline.hpp"
 #include "lve_descriptors.hpp"
 #include "lve_device.hpp"
 #include "lve_image.hpp"
-#include "lve_pipeline_ressources.hpp"
-#include "systems/lve_A_system.hpp"
+
 
 
 // libs
@@ -21,7 +18,6 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <array>
 #include <cassert>
 #include <stdexcept>
 
@@ -32,7 +28,7 @@ struct SimplePushConstantData {
     glm::mat4 normalMatrix{1.f};
 };
 
-BRDF_LUTSystem::BRDF_LUTSystem(LveDevice& device) : LveASystem(device, "gendbrdfLut", nullptr) {
+BRDF_LUTSystem::BRDF_LUTSystem(LveDevice& device) : lveDevice(device) {
     createBRDFLUTImage();
     createDescriptorPool();
     createDescriptorSetLayout();
